@@ -24,15 +24,28 @@ function switchResonanceLevel(level) {
   const countryBtn = document.getElementById('toggle-country');
   const cityBtn = document.getElementById('toggle-city');
   const citySelect = document.getElementById('resonance-city-select');
+  const modeBadge = document.getElementById('active-mode-badge');
 
   if (level === 'country') {
     countryBtn.className = "px-3 py-1 rounded-md text-xs font-bold bg-white text-slate-800 shadow-sm";
     cityBtn.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-600";
     citySelect.classList.add('d-none');
+    
+    // Update Mode Badge
+    if (modeBadge) {
+      modeBadge.textContent = 'Country Mode';
+      modeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200';
+    }
   } else {
     cityBtn.className = "px-3 py-1 rounded-md text-xs font-bold bg-white text-slate-800 shadow-sm";
     countryBtn.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-600";
     citySelect.classList.remove('d-none');
+    
+    // Update Mode Badge
+    if (modeBadge) {
+      modeBadge.textContent = 'City Mode';
+      modeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200';
+    }
   }
   
   updateResonanceTarget();
@@ -65,12 +78,15 @@ function handleCountryChange(countrySelect) {
 }
 
 /**
- * Update HTMX target path and hx-select element dynamically
+ * Update HTMX target path, hx-select element, and data-mode attribute dynamically
  */
 function updateResonanceTarget() {
   const countryVal = document.getElementById('resonance-country-select').value;
   const cityVal = document.getElementById('resonance-city-select').value;
   const contentArea = document.getElementById('resonance-content');
+
+  // Set attribute for mode-based styling/scripting hooks
+  contentArea.setAttribute('data-mode', currentResonanceLevel);
 
   if (currentResonanceLevel === 'country') {
     contentArea.setAttribute('hx-get', `/partials/countries/${countryVal}.html`);

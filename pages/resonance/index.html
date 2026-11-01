@@ -1,5 +1,4 @@
-<!-- pages/resonance.html -->
-<!-- pages/resonance.html -->
+<!-- pages/resonance/index.html -->
 <script src="/pages/resonance/index.js" defer></script>
 
 <main class="max-w-[1440px] mx-auto px-4 py-6">
@@ -7,9 +6,15 @@
   <!-- Navigation Header & Controls Bar -->
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
-        <span>🌅</span> Resonance Signals
-      </h1>
+      <div class="flex items-center gap-2">
+        <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
+          <span>🌅</span> Resonance Signals
+        </h1>
+        <!-- Active Mode Indicator Badge -->
+        <span id="active-mode-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
+          Country Mode
+        </span>
+      </div>
       <p class="text-xs text-slate-500 mt-1">Discover the unique characteristics and energy patterns of destinations</p>
     </div>
 
@@ -40,7 +45,7 @@
         <option value="azerbaijan">🇦🇿 Azerbaijan</option>
       </select>
 
-      <!-- City Selector (Hidden by default until City Level is toggled) -->
+      <!-- City Selector -->
       <select id="resonance-city-select" 
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer d-none"
               onchange="updateResonanceTarget()">
@@ -51,8 +56,9 @@
     </div>
   </div>
 
-  <!-- Dynamic Content Area (Swaps partials) -->
+  <!-- Dynamic Content Area -->
   <div id="resonance-content"
+       data-mode="country"
        hx-get="/partials/countries/argentina.html"
        hx-select="#resonance-section"
        hx-trigger="load"
