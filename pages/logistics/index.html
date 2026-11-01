@@ -1,0 +1,122 @@
+<!-- pages/logistics/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logistics & Global Comparison | EchoGlaze</title>
+
+  <!-- Global & Token CSS -->
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/animations.css">
+
+  <!-- HTMX Library -->
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-dark text-light font-sans antialiased">
+
+  <!-- Top Sticky Navigation Bar matching Svelte layout -->
+  <nav class="sticky top-0 z-20 bg-surface border-b border-border p-4 shadow-sm">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Mode Switch & Transportation Action Grid -->
+      <div class="flex flex-col md:flex-row items-stretch gap-4 w-full">
+        
+        <!-- Global View Toggle Container -->
+        <div class="flex items-center p-1.5 bg-surface-soft backdrop-blur-md rounded-[1.5rem] border border-border/50">
+          <button 
+            class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 bg-surface text-primary shadow-md scale-100"
+            onclick="switchMode('filters')">
+            COMPARE ALL
+          </button>
+          <button 
+            class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 text-muted hover:text-light scale-95"
+            onclick="switchMode('country')">
+            COUNTRY VIEW
+          </button>
+        </div>
+
+        <!-- Transportation Action Card -->
+        <a href="transportation.html" 
+           class="group relative flex-1 flex items-center justify-between p-1 bg-surface border border-border rounded-[1.5rem] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
+          <div class="flex items-center gap-4 p-3">
+            <div class="w-12 h-12 rounded-xl bg-dark flex items-center justify-center text-2xl group-hover:bg-primary-soft transition-colors duration-500">
+              <span class="group-hover:scale-110 group-hover:-rotate-3 transition-transform">🚗</span>
+            </div>
+            <div>
+              <h3 class="font-black text-light text-sm tracking-tight leading-none">Transportation</h3>
+              <p class="text-[10px] text-muted font-medium mt-1">Strategy & Apps</p>
+            </div>
+          </div>
+          <div class="pr-6 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dynamic View Container -->
+  <main class="max-w-6xl mx-auto p-6">
+    <div id="logistics-content-area">
+      
+      <!-- Default View: Compare All Filters & Grid -->
+      <header class="mb-6 space-y-2">
+        <h1 class="text-xl font-black text-light">Compare Countries</h1>
+        <p class="text-muted text-xs">Filter destinations by visas or seasonality.</p>
+      </header>
+
+      <!-- Filter Controls Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light">
+          <option value="none">Visa Mode (No Month)</option>
+          <option value="jan">January</option>
+          <option value="feb">February</option>
+          <option value="mar">March</option>
+          <option value="apr">April</option>
+          <option value="may">May</option>
+          <option value="jun">June</option>
+          <option value="jul">July</option>
+          <option value="aug">August</option>
+          <option value="sep">September</option>
+          <option value="oct">October</option>
+          <option value="nov">November</option>
+          <option value="dec">December</option>
+        </select>
+        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light">
+          <option value="all">Visa Type: All</option>
+          <option value="nomad">Digital Nomad Visa</option>
+          <option value="tourist">Tourist Visa</option>
+          <option value="visaFree">Visa‑Free Stay</option>
+        </select>
+      </div>
+
+      <!-- Country Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all">
+          <div class="flex justify-between items-start mb-3">
+            <span class="text-2xl">🇦🇷</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter text-muted bg-dark px-2 py-1 rounded">#1</span>
+          </div>
+          <h3 class="font-black text-light">Argentina</h3>
+          <div class="mt-4 space-y-1.5 text-[10px]">
+            <div class="flex justify-between"><span class="text-muted uppercase">Nomad Visa</span><span class="font-bold">6 Months</span></div>
+            <div class="flex justify-between"><span class="text-muted uppercase">Visa-Free Stay</span><span class="font-bold">90 Days</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function switchMode(mode) {
+      // Toggle logic placeholder for dynamic view swapping
+      console.log("Switched view mode to:", mode);
+    }
+  </script>
+</body>
+</html>
