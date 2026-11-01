@@ -1,47 +1,97 @@
 <!-- /partials/countries/azerbaijan.html -->
 <article id="country-AZE" class="country-profile" data-country="AZE">
-  
-  <header class="mb-4">
-    <div class="d-flex align-items-center gap-2">
-      <span class="fs-2">🇦🇿</span>
-      <h2 class="h3 mb-0">Azerbaijan</h2>
-      <span class="badge bg-secondary">Caucasus / Eurasia</span>
-      <span class="badge bg-info text-dark">Low-Medium Cost</span>
-    </div>
-  </header>
 
-  <!-- SECTION: Resonance Signals -->
-  <section id="resonance-section" class="card mb-4">
-    <div class="card-header bg-primary text-white">
-      <h3 class="h5 mb-0">💃 Energy & Scene</h3>
-    </div>
-    <div class="card-body">
+  <!-- SECTION 1: Logistics & Travel Readiness -->
+  <section id="logistics-section" class="card mb-4" style="display:none;">
+    <!-- (Kept hidden when viewing resonance page, visible on logistics page) -->
+  </section>
+
+  <!-- SECTION 2: Packing Strategy -->
+  <section id="packing-section" class="card mb-4" style="display:none;">
+    <!-- (Kept hidden when viewing resonance page, visible on packing page) -->
+  </section>
+
+  <!-- SECTION 3: Resonance Signals -->
+  <section id="resonance-section" class="space-y-6">
+    
+    <!-- Energy & Scene Grid -->
+    <div class="card p-4 shadow-sm bg-white rounded-2xl border border-slate-200">
+      <h3 class="h5 mb-3 text-slate-800 fw-bold">💃 Energy & Scene</h3>
       <div class="row g-3">
         <div class="col-md-4">
-          <div class="p-2 border rounded bg-light">
-            <span class="text-muted d-block small">NIGHTLIFE</span>
-            <strong>6 / 10</strong>
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Nightlife Overall</span>
+            <strong class="fs-4 text-dark">6 / 10</strong>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="p-2 border rounded bg-light">
-            <span class="text-muted d-block small">HISTORY & CULTURE</span>
-            <strong>9 / 10</strong>
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Late Night Dining</span>
+            <strong class="fs-4 text-dark">8 / 10</strong>
           </div>
         </div>
         <div class="col-md-4">
-          <div class="p-2 border rounded bg-light">
-            <span class="text-muted d-block small">NIGHT SAFETY</span>
-            <strong>9 / 10</strong>
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Drinking Culture</span>
+            <strong class="fs-4 text-dark">5 / 10</strong>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Dance Scene</span>
+            <strong class="fs-4 text-dark">5 / 10</strong>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Music Scene</span>
+            <strong class="fs-4 text-dark">7 / 10</strong>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Bar Density</span>
+            <strong class="fs-4 text-dark">6 / 10</strong>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Other Sections (Logistics, Transportation) -->
-  <section id="logistics-section" class="card mb-4">
-    <!-- Travel readiness info -->
+    <!-- Geographic Base -->
+    <div class="card p-4 shadow-sm bg-white rounded-2xl border border-slate-200">
+      <h3 class="h5 mb-3 text-slate-800 fw-bold">🌍 Geographic Base</h3>
+      <div class="row g-3">
+<!-- Inside /partials/countries/argentina.html or /partials/countries/azerbaijan.html -->
+<div class="col-md-6">
+  <div class="p-3 bg-light rounded-3 cursor-pointer hover:bg-slate-100 transition-colors" 
+       onclick="showGlobalMatches('snowActivities', 'Snow / Alpine Activities')">
+    <span class="text-muted small d-block">Snow / Alpine Activities</span>
+    <strong class="fs-5 text-dark">9 / 10</strong>
+  </div>
+</div>
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded-3">
+            <span class="text-muted small d-block">Water / Coastal Activities</span>
+            <strong class="fs-5 text-dark">6 / 10</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Resonance Signals -->
+    <div class="card p-4 shadow-sm bg-white rounded-2xl border border-slate-200">
+      <h3 class="h5 mb-3 text-slate-800 fw-bold">✨ Other Resonance Signals</h3>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="badge bg-secondary p-2">Nature Access: 8/10</span>
+        <span class="badge bg-secondary p-2">Social Proximity: 8/10</span>
+        <span class="badge bg-secondary p-2">Social Meetups: 7/10</span>
+        <span class="badge bg-secondary p-2">Festival Culture: 7/10</span>
+        <span class="badge bg-secondary p-2">Solo Friendly: 8/10</span>
+        <span class="badge bg-secondary p-2">Expat Community: 6/10</span>
+        <span class="badge bg-secondary p-2">Safety at Night: 9/10</span>
+      </div>
+    </div>
+
   </section>
 
 </article>
