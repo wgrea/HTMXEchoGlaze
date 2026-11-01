@@ -1,5 +1,6 @@
-<!-- pages/accommodation.html -->
+<!-- pages/accommodation/index.html -->
 <script src="/pages/accommodation/index.js" defer></script>
+
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
@@ -19,10 +20,11 @@
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
               hx-get="/partials/cities/buenos-aires.html" 
               hx-target="#accommodation-content" 
+              hx-select="#stay-options-section, #food-strategy-section"
               hx-swap="innerHTML"
               onchange="fetchAccommodationCity(this)">
         <option value="buenos-aires" data-country="argentina" selected>Buenos Aires (BUE)</option>
-        <option value="baku" data-country="azerbaijan" class="d-none">Baku (BAK)</option>
+        <option value="baku" data-country="azerbaijan" class="hidden">Baku (BAK)</option>
       </select>
     </div>
   </div>
@@ -36,8 +38,9 @@
   <!-- Content Container (Loads city accommodation/food partials) -->
   <div id="accommodation-content" 
        hx-get="/partials/cities/buenos-aires.html" 
+       hx-select="#stay-options-section, #food-strategy-section"
        hx-trigger="load" 
        hx-swap="innerHTML">
-    <!-- City stay options and food strategy load here -->
+    <!-- Partial stay/food sections load here -->
   </div>
 </main>
