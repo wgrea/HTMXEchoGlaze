@@ -1,5 +1,7 @@
 <!-- pages/logistics/index.html -->
 <!DOCTYPE html>
+<script src="/pages/logistics/index.js" defer></script>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -17,28 +19,29 @@
 </head>
 <body class="bg-dark text-light font-sans antialiased">
 
-  <!-- Top Sticky Navigation Bar matching Svelte layout -->
+  <!-- Sticky Top Navigation -->
   <nav class="sticky top-0 z-20 bg-surface border-b border-border p-4 shadow-sm">
     <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       
-      <!-- Mode Switch & Transportation Action Grid -->
       <div class="flex flex-col md:flex-row items-stretch gap-4 w-full">
         
-        <!-- Global View Toggle Container -->
+        <!-- Global View Mode Switcher -->
         <div class="flex items-center p-1.5 bg-surface-soft backdrop-blur-md rounded-[1.5rem] border border-border/50">
           <button 
+            id="btn-compare-all"
             class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 bg-surface text-primary shadow-md scale-100"
-            onclick="switchMode('filters')">
+            onclick="switchMode('compare')">
             COMPARE ALL
           </button>
           <button 
+            id="btn-country-view"
             class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 text-muted hover:text-light scale-95"
             onclick="switchMode('country')">
             COUNTRY VIEW
           </button>
         </div>
 
-        <!-- Transportation Action Card -->
+        <!-- Transportation Quick Action Card -->
         <a href="transportation.html" 
            class="group relative flex-1 flex items-center justify-between p-1 bg-surface border border-border rounded-[1.5rem] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
           <div class="flex items-center gap-4 p-3">
@@ -59,20 +62,23 @@
     </div>
   </nav>
 
-  <!-- Main Dynamic View Container -->
+  <!-- Main Dynamic Workspace -->
   <main class="max-w-6xl mx-auto p-6">
-    <div id="logistics-content-area">
-      
-      <!-- Default View: Compare All Filters & Grid -->
+
+    <!-- VIEW 1: Compare All Grid -->
+    <div id="view-compare">
       <header class="mb-6 space-y-2">
         <h1 class="text-xl font-black text-light">Compare Countries</h1>
-        <p class="text-muted text-xs">Filter destinations by visas or seasonality.</p>
+        <p class="text-muted text-xs">Filter destinations by seasonality or visa requirements.</p>
       </header>
 
       <!-- Filter Controls Bar -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light">
-          <option value="none">Visa Mode (No Month)</option>
+        <select 
+          id="month-select" 
+          class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light cursor-pointer"
+          onchange="filterCompareGrid()">
+          <option value="all" selected>Visa Mode (No Month Filter)</option>
           <option value="jan">January</option>
           <option value="feb">February</option>
           <option value="mar">March</option>
@@ -86,37 +92,71 @@
           <option value="nov">November</option>
           <option value="dec">December</option>
         </select>
-        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light">
+
+        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light cursor-pointer">
           <option value="all">Visa Type: All</option>
           <option value="nomad">Digital Nomad Visa</option>
-          <option value="tourist">Tourist Visa</option>
+          <option value="tourist">Tourist Visa / E-Visa</option>
           <option value="visaFree">Visa‑Free Stay</option>
         </select>
       </div>
 
-      <!-- Country Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all">
+      <!-- Country Cards Compare Grid -->
+      <div id="compare-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- Argentina Card -->
+        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all cursor-pointer"
+             onclick="loadCountryView('argentina')">
           <div class="flex justify-between items-start mb-3">
             <span class="text-2xl">🇦🇷</span>
             <span class="text-[9px] font-black uppercase tracking-tighter text-muted bg-dark px-2 py-1 rounded">#1</span>
           </div>
           <h3 class="font-black text-light">Argentina</h3>
           <div class="mt-4 space-y-1.5 text-[10px]">
-            <div class="flex justify-between"><span class="text-muted uppercase">Nomad Visa</span><span class="font-bold">6 Months</span></div>
-            <div class="flex justify-between"><span class="text-muted uppercase">Visa-Free Stay</span><span class="font-bold">90 Days</span></div>
+            <div class="flex justify-between"><span class="text-muted uppercase">Work Policy</span><span class="font-bold">Transit Status</span></div>
+            <div class="flex justify-between"><span class="text-muted uppercase">Registration</span><span class="font-bold">None</span></div>
           </div>
         </div>
+
+        <!-- Azerbaijan Card -->
+        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all cursor-pointer"
+             onclick="loadCountryView('azerbaijan')">
+          <div class="flex justify-between items-start mb-3">
+            <span class="text-2xl">🇦🇿</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter text-muted bg-dark px-2 py-1 rounded">#2</span>
+          </div>
+          <h3 class="font-black text-light">Azerbaijan</h3>
+          <div class="mt-4 space-y-1.5 text-[10px]">
+            <div class="flex justify-between"><span class="text-muted uppercase">Work Policy</span><span class="font-bold">ASAN / e-Visa</span></div>
+            <div class="flex justify-between"><span class="text-muted uppercase">Registration</span><span class="font-bold">Within 15 Days</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: Single Country Detail View -->
+    <div id="view-country" class="hidden">
+      <div class="mb-6 flex items-center justify-between">
+        <select 
+          id="country-selector"
+          class="text-xs font-bold uppercase p-3 rounded-xl border border-border bg-surface text-light cursor-pointer min-w-[200px]"
+          hx-get="../partials/countries/argentina.html"
+          hx-target="#country-detail-target"
+          hx-swap="innerHTML"
+          onchange="htmx.ajax('GET', '../partials/countries/' + this.value + '.html', '#country-detail-target')">
+          <option value="argentina" selected>🇦🇷 Argentina</option>
+          <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+        </select>
       </div>
 
+      <!-- Full Partial Ingestion Area -->
+      <div id="country-detail-target">
+        <!-- Partials load here -->
+      </div>
     </div>
+
   </main>
 
-  <script>
-    function switchMode(mode) {
-      // Toggle logic placeholder for dynamic view swapping
-      console.log("Switched view mode to:", mode);
-    }
-  </script>
 </body>
 </html>

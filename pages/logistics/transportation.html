@@ -14,111 +14,43 @@
 
   <!-- HTMX Library -->
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/select-response.js"></script>
 </head>
-<body class="bg-dark text-light font-sans antialiased">
+<body class="bg-dark text-light font-sans antialiased" hx-ext="select-response">
 
-  <!-- Top Sticky Navigation & Selector Bar -->
+  <!-- Navigation Bar -->
   <nav class="sticky top-0 z-10 bg-surface/80 backdrop-blur-md border-b border-border p-4">
     <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         <span class="text-xl">🚗</span>
         <select 
           id="transport-country-select" 
-          class="bg-transparent font-bold text-primary outline-none cursor-pointer text-sm"
+          class="bg-surface font-bold text-primary outline-none cursor-pointer text-sm p-2 rounded-xl border border-border"
           hx-get="../partials/countries/argentina.html"
+          hx-select="#transportation-section"
           hx-target="#transport-data-target"
-          hx-swap="innerHTML">
-          <option value="all" selected>Select a country...</option>
-          <option value="argentina">🇦🇷 Argentina</option>
-          <option value="armenia">🇦🇲 Armenia</option>
+          hx-swap="innerHTML"
+          onchange="this.setAttribute('hx-get', '../partials/countries/' + this.value + '.html'); htmx.process(this); htmx.trigger(this, 'change-country');"
+          hx-trigger="change-country">
+          <option value="argentina" selected>🇦🇷 Argentina</option>
           <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-          <option value="bangladesh">🇧🇩 Bangladesh</option>
-          <option value="bolivia">🇧🇴 Bolivia</option>
-          <option value="brazil">🇧🇷 Brazil</option>
-          <option value="colombia">🇨🇴 Colombia</option>
-          <option value="egypt">🇪🇬 Egypt</option>
-          <option value="spain">🇪🇸 Spain</option>
-          <option value="georgia">🇬🇪 Georgia</option>
-          <option value="greece">🇬🇷 Greece</option>
-          <option value="indonesia">🇮🇩 Indonesia</option>
-          <option value="india">🇮🇳 India</option>
-          <option value="jordan">🇯🇴 Jordan</option>
-          <option value="kazakhstan">🇰🇿 Kazakhstan</option>
-          <option value="laos">🇱🇦 Laos</option>
-          <option value="srilanka">🇱🇰 Sri Lanka</option>
-          <option value="morocco">🇲🇦 Morocco</option>
-          <option value="mexico">🇲🇽 Mexico</option>
-          <option value="nepal">🇳🇵 Nepal</option>
-          <option value="pakistan">🇵🇰 Pakistan</option>
-          <option value="panama">🇵🇦 Panama</option>
-          <option value="portugal">🇵🇹 Portugal</option>
-          <option value="qatar">🇶🇦 Qatar</option>
-          <option value="romania">🇷🇴 Romania</option>
-          <option value="thailand">🇹🇭 Thailand</option>
-          <option value="turkey">🇹🇷 Turkey</option>
-          <option value="usa">🇺🇸 United States of America</option>
-          <option value="uzbekistan">🇺🇿 Uzbekistan</option>
         </select>
       </div>
 
-      <!-- Destination Meta Target -->
-      <div id="transport-meta-target" class="text-right">
-        <span class="block text-xs font-bold text-light">Argentina</span>
-        <span class="block text-[10px] uppercase tracking-wider text-muted">South America</span>
-      </div>
+      <a href="index.html" class="text-xs font-black uppercase text-muted hover:text-light transition-colors">
+        ← Back to Logistics
+      </a>
     </div>
   </nav>
 
-  <!-- Main Content Container -->
+  <!-- Main Target Container -->
   <main class="max-w-6xl mx-auto px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight mb-2">🚗 Transportation</h1>
-      <p class="text-muted text-sm">How locals move — cheapest by day, safest by night.</p>
-    </header>
-
-    <div id="transport-data-target" class="space-y-6">
-      
-      <!-- Daytime Mobility -->
-      <section class="bg-surface rounded-xl border border-border p-6 shadow-sm">
-        <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">🌞 Daytime Mobility</h2>
-        <div class="space-y-2 text-sm">
-          <p><strong class="text-light">Default mode:</strong> Subte</p>
-          <p><strong class="text-light">Cheapest mode:</strong> Colectivo (bus)</p>
-          <p><strong class="text-light">Recommended card:</strong> SUBE</p>
-          <p class="text-xs text-muted mt-2">The SUBE card is mandatory and sometimes hard to find—buy it at a "Kiosco".</p>
-        </div>
-      </section>
-
-      <!-- Nighttime Mobility -->
-      <section class="bg-surface rounded-xl border border-border p-6 shadow-sm">
-        <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">🌙 Nighttime Mobility</h2>
-        <div class="space-y-2 text-sm">
-          <p><strong class="text-light">Safest mode:</strong> Ride-hailing</p>
-          <p><strong class="text-light">Recommended apps:</strong> Cabify, Uber</p>
-          <p class="text-xs text-muted mt-2">Cabify is often preferred by locals for safety and fixed pricing.</p>
-        </div>
-      </section>
-
-      <!-- Recommended Apps -->
-      <section class="bg-surface rounded-xl border border-border p-6 shadow-sm">
-        <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">📱 Recommended Apps</h2>
-        <div class="space-y-2 text-sm">
-          <p><strong class="text-light">Ride-hailing:</strong> Cabify, Uber, Didi</p>
-          <p><strong class="text-light">Transit:</strong> Moovit, Google Maps</p>
-          <p><strong class="text-light">Navigation:</strong> Google Maps</p>
-        </div>
-      </section>
-
-      <!-- Intercity Travel -->
-      <section class="bg-surface rounded-xl border border-border p-6 shadow-sm">
-        <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">🚆 Intercity Travel</h2>
-        <div class="space-y-2 text-sm">
-          <p><strong class="text-light">Cheapest:</strong> Bus</p>
-          <p><strong class="text-light">Fastest:</strong> Plane</p>
-          <p><strong class="text-light">Recommended:</strong> Plane (Aerolineas Argentinas)</p>
-        </div>
-      </section>
-
+    <div 
+      id="transport-data-target" 
+      hx-get="../partials/countries/argentina.html" 
+      hx-select="#transportation-section" 
+      hx-trigger="load">
+      <!-- Section loaded dynamically from partial -->
     </div>
   </main>
 
