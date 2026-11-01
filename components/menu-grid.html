@@ -1,0 +1,76 @@
+<!-- components/menu-grid.html -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-5xl mx-auto px-4">
+  
+  <!-- Destination Finder (Resonance) -->
+    <a href="#"
+      hx-get="pages/resonance/index.html"
+      hx-target="#app-main-content"
+      hx-swap="innerHTML"
+     class="aero-btn-card bg-gradient-to-br from-pink-400 via-rose-300 to-amber-200 group">
+    <div class="aero-btn-inner flex items-center justify-between">
+      <div class="flex items-center gap-5 relative z-10">
+        <span class="text-4xl drop-shadow-md group-hover:scale-110 transition-transform">🌅</span>
+        <div>
+          <h3 class="text-lg font-black text-slate-900 leading-tight mb-1">Destination Finder</h3>
+          <p class="text-xs text-slate-600 font-medium">Match places to your travel style</p>
+        </div>
+      </div>
+      <span class="text-xl text-rose-500 font-bold opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 relative z-10">→</span>
+    </div>
+  </a>
+
+  <!-- Accommodation Finder -->
+  <a href="#"
+     hx-get="pages/accommodation/index.html"
+     hx-target="#app-main-content" 
+     hx-swap="innerHTML"
+     class="aero-btn-card bg-gradient-to-br from-amber-300 via-yellow-200 to-amber-100 group">
+    <div class="aero-btn-inner flex items-center justify-between">
+      <div class="flex items-center gap-5 relative z-10">
+        <span class="text-4xl drop-shadow-md group-hover:scale-110 transition-transform">🏠</span>
+        <div>
+          <h3 class="text-lg font-black text-slate-900 leading-tight mb-1">Accommodation Finder</h3>
+          <p class="text-xs text-slate-600 font-medium">Workable stays, Wi-Fi tiers & food hubs</p>
+        </div>
+      </div>
+      <span class="text-xl text-amber-600 font-bold opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 relative z-10">→</span>
+    </div>
+  </a>
+
+  <!-- Logistics Hub -->
+  <a href="#"
+     hx-get="pages/logistics/index.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML"
+     class="aero-btn-card bg-gradient-to-br from-blue-300 via-sky-200 to-indigo-100 group">
+    <div class="aero-btn-inner flex items-center justify-between">
+      <div class="flex items-center gap-5 relative z-10">
+        <span class="text-4xl drop-shadow-md group-hover:scale-110 transition-transform">✈️</span>
+        <div>
+          <h3 class="text-lg font-black text-slate-900 leading-tight mb-1">Logistics Hub</h3>
+          <p class="text-xs text-slate-600 font-medium">Visas, seasonality & comparison</p>
+        </div>
+      </div>
+      <span class="text-xl text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 relative z-10">→</span>
+    </div>
+  </a>
+
+  <!-- Packing Strategy -->
+  <a href="#"
+     hx-get="pages/packing/index.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML"
+     class="aero-btn-card bg-gradient-to-br from-emerald-300 via-teal-200 to-emerald-100 group">
+    <div class="aero-btn-inner flex items-center justify-between">
+      <div class="flex items-center gap-5 relative z-10">
+        <span class="text-4xl drop-shadow-md group-hover:scale-110 transition-transform">🎒</span>
+        <div>
+          <h3 class="text-lg font-black text-slate-900 leading-tight mb-1">Packing Strategy</h3>
+          <p class="text-xs text-slate-600 font-medium">Regional constraints & tech loadout</p>
+        </div>
+      </div>
+      <span class="text-xl text-emerald-600 font-bold opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 relative z-10">→</span>
+    </div>
+  </a>
+
+</div>

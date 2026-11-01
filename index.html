@@ -1,0 +1,51 @@
+<!-- index.html -->
+
+<!-- Instant Node Server: npx serve -->
+<!-- File directory tree: tree /f -->
+
+<!-- If you don't understand the JavaScript/TypeScript code, depending on what you use, do not paste it -->
+
+<!-- Is HTMX a library or a framework? HTMX is strictly a JavaScript library, not a framework. It’s just one small file (~14KB) that you drop into your <head>, much like jQuery back in the day, but with a completely different philosophy. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EchoGlaze</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+  <!-- Floating Background Elements -->
+  <div hx-get="components/background-elements.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+  <!-- Navigation -->
+  <div hx-get="components/nav.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+  <!-- Dynamic Application Main Target -->
+  <main id="app-main-content" class="transition-all duration-300">
+    
+    <!-- Header / Banner -->
+    <div hx-get="components/header.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+    <!-- Core 4 Tools Menu Grid -->
+    <div hx-get="components/menu-grid.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+    <!-- Secondary Hub / Support Links -->
+    <div hx-get="components/support-links.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+  </main>
+
+  <!-- Footer -->
+  <div hx-get="components/footer.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+</body>
+</html>

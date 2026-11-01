@@ -1,0 +1,66 @@
+<!-- components/nav.html -->
+<header class="sticky top-0 z-50 py-4 pointer-events-none">
+  <div class="max-w-[1440px] mx-auto px-4 flex flex-col items-center">
+    
+    <!-- UNIFIED RESPONSIVE NAV PILL -->
+    <div class="pointer-events-auto flex flex-col bg-white/80 backdrop-blur-2xl rounded-[2rem] border border-white/50 shadow-2xl transition-all duration-500 overflow-hidden w-full max-w-fit">
+      
+      <!-- Top Bar: Logo & Desktop Links -->
+      <div class="flex items-center gap-3 p-2">
+        <a href="/" 
+           hx-get="components/menu-grid.html" 
+           hx-target="#app-main-content" 
+           hx-swap="innerHTML"
+           class="flex items-center pl-3 pr-2 font-black tracking-wider text-slate-800 text-base group transition-transform active:scale-95">
+          EchoGlaze
+        </a>
+
+        <!-- Vertical Divider (Desktop only) -->
+        <div class="w-px h-6 bg-slate-200/60 hidden md:block"></div>
+
+        <!-- I want the navigation to be responsive whether in desktop mode and mobile mode -->
+<nav class="hidden md:flex items-center gap-1">
+
+  <a href="#"
+     hx-get="pages/logistics.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML">
+    ✈️ Logistics
+  </a>
+
+  <a href="#"
+     hx-get="pages/accommodation/index.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML">
+    🏠 Accommodation
+  </a>
+
+  <a href="#"
+     hx-get="pages/resonance/index.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML">
+    🌅 Resonance
+  </a>
+
+  <a href="#"
+     hx-get="pages/packing.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML">
+    🎒 Packing
+  </a>
+
+  <a href="#"
+     hx-get="pages/support.html"
+     hx-target="#app-main-content"
+     hx-swap="innerHTML">
+    🌐 Support
+  </a>
+
+</nav>
+      </div>
+
+      
+
+    </div>
+  </div>
+</header>

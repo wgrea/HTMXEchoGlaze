@@ -1,0 +1,47 @@
+<!-- pages/packing.html -->
+<main class="max-w-[1440px] mx-auto px-4 py-6">
+  <div class="mb-6 flex items-center justify-between bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+    <h1 class="text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-2">
+      <span>🎒</span> Packing Strategy & Gear Loadout
+    </h1>
+
+    <select name="country" 
+            class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer">
+      <option value="ARG" selected>🇦🇷 Argentina</option>
+      <option value="AZE">🇦🇿 Azerbaijan</option>
+    </select>
+  </div>
+
+  <div id="packing-content" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Regional Style & Uniform -->
+    <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-sm">
+      <h2 class="text-xs font-black uppercase tracking-widest text-emerald-800 mb-3">Regional Style</h2>
+      <p class="text-sm text-slate-600 mb-4">Smart-casual with dark tones. Argentines dress well; avoid looking like a 'backpacker' in the city.</p>
+      
+      <h2 class="text-xs font-black uppercase tracking-widest text-emerald-800 mb-3">Airport Protocol</h2>
+      <p class="text-sm text-slate-600">Light jacket for long-haul flights; easy-access pocket for transit cards.</p>
+    </div>
+
+    <!-- Tech & Console Loadout -->
+    <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xs font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
+          <span>🎮</span> Tech & Console Loadout
+        </h2>
+        <span class="text-[10px] font-mono bg-slate-800 px-2 py-1 rounded-lg text-slate-300">Switch 2 / Handhelds</span>
+      </div>
+
+      <ul class="space-y-3 text-sm text-slate-300">
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Large tech-dedicated backpack (30L+)
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> Hard-shell protective cases (Mandatory for overhead storage)
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-emerald-400">✓</span> 65W GaN Charger + 3m USB-C Cable
+        </li>
+      </ul>
+    </div>
+  </div>
+</main>

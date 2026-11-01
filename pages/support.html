@@ -1,0 +1,14 @@
+<!-- pages/support.html -->
+<main class="max-w-[1440px] mx-auto px-4 py-6">
+  <div class="bg-white/80 backdrop-blur-md p-8 rounded-3xl border border-slate-200/80 shadow-sm max-w-2xl mx-auto text-center">
+    <span class="text-3xl mb-3 block">🌐</span>
+    <h1 class="text-lg font-black uppercase tracking-widest text-slate-800 mb-2">Support & Data Architecture</h1>
+    <p class="text-xs text-slate-500 mb-6">Learn more about the EchoGlaze design tokens and system architecture.</p>
+
+    <div hx-get="/components/support-links.html" 
+         hx-trigger="load" 
+         hx-swap="innerHTML">
+      <!-- Component loads here -->
+    </div>
+  </div>
+</main>

@@ -1,0 +1,32 @@
+<!-- pages/logistics.html -->
+<main class="max-w-[1440px] mx-auto px-4 py-6">
+  <!-- Top Location Filter -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-black uppercase tracking-widest text-slate-500">Global Location</span>
+      <select name="country" 
+              class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              hx-get="/partials/countries/argentina.html" 
+              hx-target="#logistics-content" 
+              hx-swap="innerHTML">
+        <option value="ARG" selected>🇦🇷 Argentina</option>
+        <option value="AZE">🇦🇿 Azerbaijan</option>
+        <option value="USA">🇺🇸 United States</option>
+      </select>
+    </div>
+
+    <!-- Toggle Sub-views -->
+    <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+      <button class="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg bg-white shadow-sm text-slate-800">Country View</button>
+      <button class="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg text-slate-500 hover:text-slate-800">Compare All</button>
+    </div>
+  </div>
+
+  <!-- Dynamic Content Area -->
+  <div id="logistics-content" 
+       hx-get="/partials/countries/argentina.html" 
+       hx-trigger="load" 
+       hx-swap="innerHTML">
+    <!-- Initial partial content loads here -->
+  </div>
+</main>
