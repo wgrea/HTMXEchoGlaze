@@ -37,3 +37,7 @@
     htmx.process(contentArea);
     htmx.trigger(contentArea, 'load');
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+  updateResonanceTarget();
+});

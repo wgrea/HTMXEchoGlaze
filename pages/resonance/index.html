@@ -1,4 +1,5 @@
 <!-- pages/resonance.html -->
+<script src="/pages/resonance/index.js" defer></script>
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
     <div>
@@ -35,9 +36,10 @@
   </div>
 
   <!-- Dynamic Content Area -->
-  <div id="resonance-content" 
-       hx-trigger="load" 
-       hx-swap="innerHTML">
-    <!-- Resonance signals and global matches load here -->
+<div id="resonance-content"
+     hx-get="/partials/countries/argentina.html"
+     hx-select="#resonance-section"
+     hx-trigger="load"
+     hx-swap="innerHTML">
   </div>
 </main>
