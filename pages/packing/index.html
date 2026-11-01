@@ -1,5 +1,7 @@
 <!-- pages/packing/index.html -->
 <!DOCTYPE html>
+ <script src="/pages/packing/packing.js" defer></script>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -12,40 +14,31 @@
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/animations.css">
 
-  <!-- HTMX Library -->
+  <!-- HTMX Library & Select Extension -->
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/select-response.js"></script>
 </head>
 <body class="bg-dark text-light font-sans antialiased" hx-ext="select-response">
 
   <main class="max-w-[1440px] mx-auto px-4 py-6">
-    <!-- Top Control Bar -->
+    <!-- Header Control Bar -->
     <div class="mb-6 flex items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
       <h1 class="text-sm font-black uppercase tracking-widest text-light flex items-center gap-2">
         <span>🎒</span> Packing Strategy & Gear Loadout
       </h1>
 
       <select 
-        name="country" 
+        id="packing-country-select"
         class="px-3 py-1.5 bg-surface-soft rounded-xl text-xs font-bold text-light border border-border outline-none cursor-pointer"
-        hx-get="../partials/countries/argentina.html"
-        hx-select="#packing-section"
-        hx-target="#packing-content"
-        hx-swap="innerHTML"
-        onchange="this.setAttribute('hx-get', '../partials/countries/' + this.value + '.html'); htmx.process(this); htmx.trigger(this, 'change-country');"
-        hx-trigger="change-country">
+        onchange="loadPackingData(this.value)">
         <option value="argentina" selected>🇦🇷 Argentina</option>
         <option value="azerbaijan">🇦🇿 Azerbaijan</option>
       </select>
     </div>
 
-    <!-- Main Dynamic Packing Section Target -->
-    <div 
-      id="packing-content" 
-      hx-get="../partials/countries/argentina.html" 
-      hx-select="#packing-section" 
-      hx-trigger="load">
-      <!-- Section loaded dynamically from partial -->
+    <!-- Main Dynamic Target for Packing Data -->
+    <div id="packing-content">
+      <!-- Loaded dynamically via HTMX -->
     </div>
   </main>
 

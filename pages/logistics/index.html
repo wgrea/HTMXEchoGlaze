@@ -1,162 +1,63 @@
 <!-- pages/logistics/index.html -->
-<!DOCTYPE html>
-<script src="/pages/logistics/index.js" defer></script>
-
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logistics & Global Comparison | EchoGlaze</title>
-
-  <!-- Global & Token CSS -->
-  <link rel="stylesheet" href="../css/tokens.css">
-  <link rel="stylesheet" href="../css/layout.css">
-  <link rel="stylesheet" href="../css/components.css">
-  <link rel="stylesheet" href="../css/animations.css">
-
-  <!-- HTMX Library -->
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
-<body class="bg-dark text-light font-sans antialiased">
-
-  <!-- Sticky Top Navigation -->
-  <nav class="sticky top-0 z-20 bg-surface border-b border-border p-4 shadow-sm">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+<nav class="sticky top-0 z-20 bg-white border-b border-slate-200 p-4 shadow-sm">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row items-stretch gap-4 w-full max-w-6xl">
       
-      <div class="flex flex-col md:flex-row items-stretch gap-4 w-full">
-        
-        <!-- Global View Mode Switcher -->
-        <div class="flex items-center p-1.5 bg-surface-soft backdrop-blur-md rounded-[1.5rem] border border-border/50">
-          <button 
-            id="btn-compare-all"
-            class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 bg-surface text-primary shadow-md scale-100"
-            onclick="switchMode('compare')">
-            COMPARE ALL
-          </button>
-          <button 
-            id="btn-country-view"
-            class="flex-1 min-w-[140px] relative px-5 py-3 rounded-xl text-xs font-black tracking-widest transition-all duration-300 text-muted hover:text-light scale-95"
-            onclick="switchMode('country')">
-            COUNTRY VIEW
-          </button>
-        </div>
-
-        <!-- Transportation Quick Action Card -->
-        <a href="transportation.html" 
-           class="group relative flex-1 flex items-center justify-between p-1 bg-surface border border-border rounded-[1.5rem] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden">
-          <div class="flex items-center gap-4 p-3">
-            <div class="w-12 h-12 rounded-xl bg-dark flex items-center justify-center text-2xl group-hover:bg-primary-soft transition-colors duration-500">
-              <span class="group-hover:scale-110 group-hover:-rotate-3 transition-transform">🚗</span>
-            </div>
-            <div>
-              <h3 class="font-black text-light text-sm tracking-tight leading-none">Transportation</h3>
-              <p class="text-[10px] text-muted font-medium mt-1">Strategy & Apps</p>
-            </div>
-          </div>
-          <div class="pr-6 opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-          </div>
-        </a>
-
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main Dynamic Workspace -->
-  <main class="max-w-6xl mx-auto p-6">
-
-    <!-- VIEW 1: Compare All Grid -->
-    <div id="view-compare">
-      <header class="mb-6 space-y-2">
-        <h1 class="text-xl font-black text-light">Compare Countries</h1>
-        <p class="text-muted text-xs">Filter destinations by seasonality or visa requirements.</p>
-      </header>
-
-      <!-- Filter Controls Bar -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-        <select 
-          id="month-select" 
-          class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light cursor-pointer"
-          onchange="filterCompareGrid()">
-          <option value="all" selected>Visa Mode (No Month Filter)</option>
-          <option value="jan">January</option>
-          <option value="feb">February</option>
-          <option value="mar">March</option>
-          <option value="apr">April</option>
-          <option value="may">May</option>
-          <option value="jun">June</option>
-          <option value="jul">July</option>
-          <option value="aug">August</option>
-          <option value="sep">September</option>
-          <option value="oct">October</option>
-          <option value="nov">November</option>
-          <option value="dec">December</option>
-        </select>
-
-        <select class="text-[10px] font-bold uppercase p-2 rounded border border-border bg-surface text-light cursor-pointer">
-          <option value="all">Visa Type: All</option>
-          <option value="nomad">Digital Nomad Visa</option>
-          <option value="tourist">Tourist Visa / E-Visa</option>
-          <option value="visaFree">Visa‑Free Stay</option>
-        </select>
+      <!-- View Toggle -->
+      <div class="flex items-center p-1.5 bg-slate-200/50 backdrop-blur-md rounded-[1.5rem] border border-slate-300/30">
+        <button 
+          hx-get="/components/logistics/compare-all.html"
+          hx-target="#logistics-main"
+          class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest bg-white text-indigo-600 shadow-md"
+        >
+          COMPARE ALL
+        </button>
+        <button 
+          hx-get="/partials/countries/argentina.html"
+          hx-target="#logistics-main"
+          class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest text-slate-500 hover:text-slate-700"
+        >
+          COUNTRY VIEW
+        </button>
       </div>
 
-      <!-- Country Cards Compare Grid -->
-      <div id="compare-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        
-        <!-- Argentina Card -->
-        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all cursor-pointer"
-             onclick="loadCountryView('argentina')">
-          <div class="flex justify-between items-start mb-3">
-            <span class="text-2xl">🇦🇷</span>
-            <span class="text-[9px] font-black uppercase tracking-tighter text-muted bg-dark px-2 py-1 rounded">#1</span>
+      <!-- Transportation Button -->
+      <a href="/pages/logistics/transportation.html" 
+         class="group relative flex-1 flex items-center justify-between p-1 bg-white border border-slate-200 rounded-[1.5rem] shadow-sm hover:shadow-xl transition-all"
+      >
+        <div class="flex items-center gap-4 p-3">
+          <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-2xl group-hover:bg-indigo-50">
+            <span>🚗</span>
           </div>
-          <h3 class="font-black text-light">Argentina</h3>
-          <div class="mt-4 space-y-1.5 text-[10px]">
-            <div class="flex justify-between"><span class="text-muted uppercase">Work Policy</span><span class="font-bold">Transit Status</span></div>
-            <div class="flex justify-between"><span class="text-muted uppercase">Registration</span><span class="font-bold">None</span></div>
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">Transportation</h3>
+            <p class="text-[10px] text-slate-500 font-medium">Strategy & Apps</p>
           </div>
         </div>
+      </a>
 
-        <!-- Azerbaijan Card -->
-        <div class="p-5 bg-surface border border-border rounded-2xl shadow-sm hover:border-primary transition-all cursor-pointer"
-             onclick="loadCountryView('azerbaijan')">
-          <div class="flex justify-between items-start mb-3">
-            <span class="text-2xl">🇦🇿</span>
-            <span class="text-[9px] font-black uppercase tracking-tighter text-muted bg-dark px-2 py-1 rounded">#2</span>
-          </div>
-          <h3 class="font-black text-light">Azerbaijan</h3>
-          <div class="mt-4 space-y-1.5 text-[10px]">
-            <div class="flex justify-between"><span class="text-muted uppercase">Work Policy</span><span class="font-bold">ASAN / e-Visa</span></div>
-            <div class="flex justify-between"><span class="text-muted uppercase">Registration</span><span class="font-bold">Within 15 Days</span></div>
-          </div>
-        </div>
-
-      </div>
     </div>
+  </div>
+</nav>
 
-    <!-- VIEW 2: Single Country Detail View -->
-    <div id="view-country" class="hidden">
-      <div class="mb-6 flex items-center justify-between">
-        <select 
-          id="country-selector"
-          class="text-xs font-bold uppercase p-3 rounded-xl border border-border bg-surface text-light cursor-pointer min-w-[200px]"
-          hx-get="../partials/countries/argentina.html"
-          hx-target="#country-detail-target"
-          hx-swap="innerHTML"
-          onchange="htmx.ajax('GET', '../partials/countries/' + this.value + '.html', '#country-detail-target')">
-          <option value="argentina" selected>🇦🇷 Argentina</option>
-          <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-        </select>
-      </div>
+<main class="max-w-6xl mx-auto p-6 space-y-6">
 
-      <!-- Full Partial Ingestion Area -->
-      <div id="country-detail-target">
-        <!-- Partials load here -->
-      </div>
-    </div>
+  <!-- Country Selection Header (Shared across all country views) -->
+  <header class="flex items-center gap-2">
+    <select
+      id="country-selector"
+      hx-target="#logistics-main"
+      hx-on:change="htmx.ajax('GET', `/partials/countries/${this.value}.html`, '#logistics-main')"
+      class="bg-transparent font-black text-slate-900 text-xl outline-none cursor-pointer hover:text-indigo-600 transition-colors"
+    >
+      <option value="argentina" selected>🇦🇷 Argentina</option>
+      <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+    </select>
+  </header>
 
-  </main>
+  <!-- Container swapped by HTMX -->
+  <div id="logistics-main">
+    <div hx-get="/partials/countries/argentina.html" hx-trigger="load" hx-target="#logistics-main"></div>
+  </div>
 
-</body>
-</html>
+</main>

@@ -1,58 +1,60 @@
-<!-- pages/logistics/transportation.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transportation Strategy | EchoGlaze</title>
+<!-- /pages/logistics/transportation.html -->
+<article id="transportation-page" class="space-y-8 animate-in fade-in duration-300 max-w-6xl mx-auto p-6">
+  
+  <section id="transportation-section" class="bg-surface p-6 rounded-xl border border-border space-y-6">
+    <div class="border-b border-border pb-4">
+      <h3 class="text-xl font-bold flex items-center gap-2">
+        <span>🚗</span> Transportation Strategy
+      </h3>
+      <p class="text-sm text-muted">How locals move — cheapest by day, safest by night.</p>
+    </div>
 
-  <!-- Global & Token CSS -->
-  <link rel="stylesheet" href="../css/tokens.css">
-  <link rel="stylesheet" href="../css/layout.css">
-  <link rel="stylesheet" href="../css/components.css">
-  <link rel="stylesheet" href="../css/animations.css">
-
-  <!-- HTMX Library -->
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/select-response.js"></script>
-</head>
-<body class="bg-dark text-light font-sans antialiased" hx-ext="select-response">
-
-  <!-- Navigation Bar -->
-  <nav class="sticky top-0 z-10 bg-surface/80 backdrop-blur-md border-b border-border p-4">
-    <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span class="text-xl">🚗</span>
-        <select 
-          id="transport-country-select" 
-          class="bg-surface font-bold text-primary outline-none cursor-pointer text-sm p-2 rounded-xl border border-border"
-          hx-get="../partials/countries/argentina.html"
-          hx-select="#transportation-section"
-          hx-target="#transport-data-target"
-          hx-swap="innerHTML"
-          onchange="this.setAttribute('hx-get', '../partials/countries/' + this.value + '.html'); htmx.process(this); htmx.trigger(this, 'change-country');"
-          hx-trigger="change-country">
-          <option value="argentina" selected>🇦🇷 Argentina</option>
-          <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-        </select>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Daytime -->
+      <div class="bg-dark p-4 rounded-lg border border-border space-y-2">
+        <h4 class="font-semibold text-sm flex items-center gap-2 text-primary">🌞 Daytime Mobility</h4>
+        <ul class="text-sm space-y-1 text-muted">
+          <li><strong class="text-light">Default mode:</strong> Subte</li>
+          <li><strong class="text-light">Cheapest mode:</strong> Colectivo (bus)</li>
+          <li><strong class="text-light">Recommended card:</strong> SUBE</li>
+        </ul>
+        <div class="bg-surface/50 p-3 rounded border-l-2 border-primary text-xs mt-3">
+          The <strong>SUBE</strong> card is mandatory and sometimes hard to find—buy it at a "Kiosco".
+        </div>
       </div>
 
-      <a href="index.html" class="text-xs font-black uppercase text-muted hover:text-light transition-colors">
-        ← Back to Logistics
-      </a>
+      <!-- Nighttime -->
+      <div class="bg-dark p-4 rounded-lg border border-border space-y-2">
+        <h4 class="font-semibold text-sm flex items-center gap-2 text-primary">🌙 Nighttime Mobility</h4>
+        <ul class="text-sm space-y-1 text-muted">
+          <li><strong class="text-light">Safest mode:</strong> Ride-hailing</li>
+          <li><strong class="text-light">Recommended apps:</strong> Cabify, Uber</li>
+        </ul>
+        <div class="bg-surface/50 p-3 rounded border-l-2 border-primary text-xs mt-3">
+          <strong>Cabify</strong> is often preferred by locals for safety and fixed pricing.
+        </div>
+      </div>
     </div>
-  </nav>
 
-  <!-- Main Target Container -->
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    <div 
-      id="transport-data-target" 
-      hx-get="../partials/countries/argentina.html" 
-      hx-select="#transportation-section" 
-      hx-trigger="load">
-      <!-- Section loaded dynamically from partial -->
+    <!-- Apps & Intercity -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
+      <div class="space-y-2">
+        <h4 class="font-semibold text-sm flex items-center gap-2">📱 Recommended Apps</h4>
+        <ul class="text-sm space-y-1 text-muted">
+          <li><strong class="text-light">Ride-hailing:</strong> Cabify, Uber, Didi</li>
+          <li><strong class="text-light">Transit:</strong> Moovit, Google Maps</li>
+          <li><strong class="text-light">Navigation:</strong> Google Maps</li>
+        </ul>
+      </div>
+      <div class="space-y-2">
+        <h4 class="font-semibold text-sm flex items-center gap-2">🚆 Intercity Travel</h4>
+        <ul class="text-sm space-y-1 text-muted">
+          <li><strong class="text-light">Cheapest:</strong> Bus</li>
+          <li><strong class="text-light">Fastest:</strong> Plane</li>
+          <li><strong class="text-light">Recommended:</strong> Plane (Aerolineas Argentinas)</li>
+        </ul>
+      </div>
     </div>
-  </main>
+  </section>
 
-</body>
-</html>
+</article>

@@ -1,0 +1,99 @@
+<!-- components/logistics/global-compare-view.html -->
+<header class="mb-6 space-y-2">
+  <h1 class="text-xl font-black text-slate-900">Compare Countries</h1>
+  <p class="text-slate-500 text-xs">Filter destinations by visas or seasonality.</p>
+</header>
+
+<!-- FILTER BAR -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+
+  <!-- MONTH SELECTOR -->
+  <select 
+    name="selectedMonth" 
+    hx-get="/api/logistics?mode=filters" 
+    hx-target="#logistics-main" 
+    hx-include="#logistics-filters"
+    class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50"
+  >
+    <option value="none">Visa Mode (No Month)</option>
+    <option value="jan">January</option>
+    <option value="feb">February</option>
+    <option value="mar">March</option>
+    <option value="apr">April</option>
+    <option value="may">May</option>
+    <option value="jun">June</option>
+    <option value="jul">July</option>
+    <option value="aug">August</option>
+    <option value="sep">September</option>
+    <option value="oct">October</option>
+    <option value="nov">November</option>
+    <option value="dec">December</option>
+  </select>
+
+  <!-- VISA MODE ONLY (Conditionally rendered when selectedMonth === 'none') -->
+  <div id="visa-filters-wrapper" class="contents">
+    <!-- Sort Dropdown -->
+    <select 
+      name="sortMode" 
+      hx-get="/api/logistics?mode=filters" 
+      hx-target="#logistics-main" 
+      hx-include="#logistics-filters"
+      class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50"
+    >
+      <option disabled selected>Sort</option>
+      <option value="nomadAsc">Short → Long (Nomad)</option>
+      <option value="nomadDesc">Long → Short (Nomad)</option>
+      <option value="touristAsc">Short → Long (Tourist)</option>
+      <option value="touristDesc">Long → Short (Tourist)</option>
+      <option value="stayAsc">Short → Long (Stay)</option>
+      <option value="stayDesc">Long → Short (Stay)</option>
+    </select>
+
+    <!-- Visa Type Dropdown -->
+    <select 
+      name="visaType" 
+      hx-get="/api/logistics?mode=filters" 
+      hx-target="#logistics-main" 
+      hx-include="#logistics-filters"
+      class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50"
+    >
+      <option value="all">Visa Type: All</option>
+      <option value="nomad">Digital Nomad Visa</option>
+      <option value="tourist">Tourist Visa</option>
+      <option value="visaFree">Visa‑Free Stay</option>
+    </select>
+  </div>
+
+</div>
+
+<!-- RESULTS GRID OR EMPTY STATE -->
+<div id="compare-results">
+  <!-- If filtered.length === 0 -->
+  <!-- <p class="text-xs text-slate-500 italic">No countries match these filters.</p> -->
+
+  <!-- Else: Grid Loop -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Each Country Card triggers country view switch -->
+    <button 
+      hx-get="/api/logistics?mode=country&selectedCountryId=${country.slug}"
+      hx-target="#logistics-main"
+      hx-include="#logistics-filters"
+      class="group p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-indigo-500 hover:ring-1 hover:ring-indigo-500 transition-all text-left"
+    >
+      <div class="flex justify-between items-start mb-3">
+        <span class="text-2xl">${country.icon}</span>
+        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 bg-slate-100 px-2 py-1 rounded">
+          #${i + 1}
+        </span>
+      </div>
+
+      <h3 class="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
+        ${country.data.name}
+      </h3>
+
+      <div class="mt-4 space-y-1.5 text-[10px]">
+        <!-- Dynamic card details based on active filter mode -->
+      </div>
+    </button>
+  </div>
+</div>
