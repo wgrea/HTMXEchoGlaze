@@ -41,3 +41,36 @@
   document.addEventListener('DOMContentLoaded', () => {
   updateResonanceTarget();
 });
+const resonanceMatches = {
+  snowActivities: [
+    'Argentina',
+    'Azerbaijan'
+  ],
+
+  nightlifeOverall: [
+    'Argentina'
+  ],
+
+  safetyAtNight: [
+    'Azerbaijan'
+  ]
+};
+
+function showGlobalMatches(signal) {
+  const container =
+    document.getElementById(
+      'global-matches-container'
+    );
+
+  const matches =
+    resonanceMatches[signal] || [];
+
+  container.innerHTML = `
+    <h3>🌍 Global Matches</h3>
+    <ul>
+      ${matches.map(m =>
+        `<li>${m}</li>`
+      ).join('')}
+    </ul>
+  `;
+}
