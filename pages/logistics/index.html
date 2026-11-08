@@ -13,7 +13,7 @@
           COMPARE ALL
         </button>
         <button 
-          hx-get="/partials/countries/argentina.html"
+          hx-get="/partials/logistics/argentina.html"
           hx-target="#logistics-main"
           class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest text-slate-500 hover:text-slate-700"
         >
@@ -47,7 +47,7 @@
     <select
       id="country-selector"
       hx-target="#logistics-main"
-      hx-on:change="htmx.ajax('GET', `/partials/countries/${this.value}.html`, '#logistics-main')"
+      hx-on:change="htmx.ajax('GET', `/partials/logistics/${this.value}.html`, '#logistics-main')"`
       class="bg-transparent font-black text-slate-900 text-xl outline-none cursor-pointer hover:text-indigo-600 transition-colors"
     >
       <option value="argentina" selected>🇦🇷 Argentina</option>
@@ -57,7 +57,7 @@
 
   <!-- Container swapped by HTMX -->
   <div id="logistics-main">
-    <div hx-get="/partials/countries/argentina.html" hx-trigger="load" hx-target="#logistics-main"></div>
+    hx-get="/partials/logistics/argentina.html"
   </div>
 
 </main>

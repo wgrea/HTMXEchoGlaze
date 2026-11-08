@@ -18,7 +18,7 @@
 
       <select id="acc-city-select" 
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
-              hx-get="/partials/cities/buenos-aires.html" 
+              hx-get="/partials/accommodation/cities/buenos-aires.html"
               hx-target="#accommodation-content" 
               hx-select="#stay-options-section, #food-strategy-section"
               hx-swap="innerHTML"
@@ -37,7 +37,7 @@
 
   <!-- Content Container (Loads city accommodation/food partials) -->
   <div id="accommodation-content" 
-       hx-get="/partials/cities/buenos-aires.html" 
+       hx-get="/partials/accommodation/cities/buenos-aires.html"
        hx-select="#stay-options-section, #food-strategy-section"
        hx-trigger="load" 
        hx-swap="innerHTML">

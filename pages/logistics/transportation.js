@@ -1,7 +1,6 @@
 // pages/logistics/transportation.js
     function loadTransportData(slug) {
-      // Corrected relative path from /pages/logistics/ up to root then into /partials/countries/
-      htmx.ajax('GET', `../../partials/countries/${slug}.html`, {
+      htmx.ajax('GET', `../../partials/transportation/countries/${slug}.html`, {
         target: '#transport-data-target',
         select: '#transportation-section',
         swap: 'innerHTML'

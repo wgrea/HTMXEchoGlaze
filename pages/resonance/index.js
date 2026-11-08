@@ -89,10 +89,10 @@ function updateResonanceTarget() {
   contentArea.setAttribute('data-mode', currentResonanceLevel);
 
   if (currentResonanceLevel === 'country') {
-    contentArea.setAttribute('hx-get', `/partials/countries/${countryVal}.html`);
+    contentArea.setAttribute('hx-get', `/partials/resonance/countries/${countryVal}.html`);
     contentArea.setAttribute('hx-select', '#resonance-section');
   } else {
-    contentArea.setAttribute('hx-get', `/partials/cities/${cityVal}.html`);
+    contentArea.setAttribute('hx-get', `/partials/resonance/cities/${cityVal}.html`);
     contentArea.setAttribute('hx-select', '#city-resonance-section');
   }
 

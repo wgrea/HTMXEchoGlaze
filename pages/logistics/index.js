@@ -85,7 +85,7 @@ window.loadCountryView = function(countryKey) {
   const container = document.getElementById('country-view-content');
   if (!container) return;
 
-  const partialUrl = `../../partials/countries/${countryKey}.html`;
+  const partialUrl = `../../partials/logistics/${countryKey}.html`;
   
   fetch(partialUrl)
     .then(res => {

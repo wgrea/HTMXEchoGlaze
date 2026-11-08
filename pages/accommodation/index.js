@@ -4,7 +4,7 @@ let activeAccMode = 'stay';
 
 function fetchAccommodationCity(selectEl) {
   const citySlug = selectEl.value;
-  selectEl.setAttribute('hx-get', `/partials/cities/${citySlug}.html`);
+  selectEl.setAttribute('hx-get', `/partials/accommodation/cities/${citySlug}.html`);
   htmx.process(selectEl);
   htmx.trigger(selectEl, 'change');
 }
