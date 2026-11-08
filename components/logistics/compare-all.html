@@ -4,65 +4,9 @@
   <p class="text-slate-500 text-xs">Filter destinations by visas or seasonality.</p>
 </header>
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
-  <select class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50">
-    <option value="none">Visa Mode (No Month)</option>
-    <option value="jan">January</option>
-    <option value="feb">February</option>
-    <option value="mar">March</option>
-    <option value="apr">April</option>
-    <option value="may">May</option>
-    <option value="jun">June</option>
-    <option value="jul">July</option>
-    <option value="aug">August</option>
-    <option value="sep">September</option>
-    <option value="oct">October</option>
-    <option value="nov">November</option>
-    <option value="dec">December</option>
-  </select>
-
-  <select class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50">
-    <option value="all">Visa Type: All</option>
-    <option value="nomad">Digital Nomad Visa</option>
-    <option value="tourist">Tourist Visa</option>
-    <option value="visaFree">Visa‑Free Stay</option>
-  </select>
-</div>
-
+<!-- Should this replace the Argentina Test Card? -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-  <!-- Argentina Card -->
-  <button 
-    hx-get="/partials/logistics/argentina.html"
-    hx-target="#logistics-main"
-    class="group p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-indigo-500 transition-all text-left"
-  >
-    <div class="flex justify-between items-start mb-3">
-      <span class="text-2xl">🇦🇷</span>
-      <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 bg-slate-100 px-2 py-1 rounded">#1</span>
-    </div>
-    <h3 class="font-black text-slate-900 group-hover:text-indigo-600">Argentina</h3>
-    <div class="mt-4 space-y-1.5 text-[10px]">
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Nomad Visa</span><span class="font-bold text-slate-700">6 Months</span></div>
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Visa-Free Stay</span><span class="font-bold text-slate-700">90 Days</span></div>
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Tourist Visa</span><span class="font-bold text-slate-700">6 Months</span></div>
-    </div>
-  </button>
-
-  <!-- Armenia Card -->
-  <button 
-    hx-get="/partials/logistics/armenia.html"
-    hx-target="#logistics-main"
-    class="group p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-indigo-500 transition-all text-left"
-  >
-    <div class="flex justify-between items-start mb-3">
-      <span class="text-2xl">🇦🇲</span>
-      <span class="text-[9px] font-black uppercase tracking-tighter text-slate-400 bg-slate-100 px-2 py-1 rounded">#2</span>
-    </div>
-    <h3 class="font-black text-slate-900 group-hover:text-indigo-600">Armenia</h3>
-    <div class="mt-4 space-y-1.5 text-[10px]">
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Nomad Visa</span><span class="font-bold text-slate-700">None</span></div>
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Visa-Free Stay</span><span class="font-bold text-slate-700">180 Days</span></div>
-      <div class="flex justify-between"><span class="text-slate-400 uppercase">Tourist Visa</span><span class="font-bold text-slate-700">6 Months</span></div>
-    </div>
-  </button>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  {{COMPARISON_GRID}}
+</div>
 </div>

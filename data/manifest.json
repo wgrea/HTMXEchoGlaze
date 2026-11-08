@@ -1,0 +1,14 @@
+{
+  "countries": [
+    { "id": "ARG", "slug": "argentina", "name": "Argentina", "region": "South America", "icon": "🇦🇷", "visaType": "tourist" },
+    { "id": "ARM", "slug": "armenia", "name": "Armenia", "region": "Eurasia", "icon": "🇦🇲", "visaType": "visaFree" },
+    { "id": "AZE", "slug": "azerbaijan", "name": "Azerbaijan", "region": "Eurasia", "icon": "🇦🇿", "visaType": "nomad" },
+    { "id": "GEO", "slug": "georgia", "name": "Georgia", "region": "Eurasia", "icon": "🇬🇪", "visaType": "visaFree" }
+  ],
+  "cities": [
+    { "id": "BAK", "slug": "baku", "countryId": "AZE" },
+    { "id": "BUE", "slug": "buenos-aires", "countryId": "ARG" },
+    { "id": "TBS", "slug": "tbilisi", "countryId": "GEO" },
+    { "id": "YER", "slug": "yerevan", "countryId": "ARM" }
+  ]
+}
