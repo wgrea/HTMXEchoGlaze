@@ -1,46 +1,48 @@
 <!-- pages/packing/index.html -->
 <!DOCTYPE html>
- <script src="/pages/packing/packing.js" defer></script>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Packing Strategy & Loadout | EchoGlaze</title>
-
-  <!-- Global & Token CSS -->
   <link rel="stylesheet" href="../css/tokens.css">
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/animations.css">
-
-  <!-- HTMX Library & Select Extension -->
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/select-response.js"></script>
 </head>
-<body class="bg-dark text-light font-sans antialiased" hx-ext="select-response">
+<body class="bg-dark text-light font-sans antialiased">
 
-  <main class="max-w-[1440px] mx-auto px-4 py-6">
-    <!-- Header Control Bar -->
-    <div class="mb-6 flex items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
-      <h1 class="text-sm font-black uppercase tracking-widest text-light flex items-center gap-2">
-        <span>🎒</span> Packing Strategy & Gear Loadout
-      </h1>
+<!-- pages/packing/index.html -->
+<main class="max-w-[1440px] mx-auto px-4 py-6">
+  <!-- Header Control Bar -->
+  <div class="mb-6 flex items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
+    <h1 class="text-sm font-black uppercase tracking-widest text-light flex items-center gap-2">
+      <span>🎒</span> Packing Strategy & Gear Loadout
+    </h1>
 
-      <select 
-        id="packing-country-select"
-        class="px-3 py-1.5 bg-surface-soft rounded-xl text-xs font-bold text-light border border-border outline-none cursor-pointer"
-        onchange="loadPackingData(this.value)">
-        <option value="argentina" selected>🇦🇷 Argentina</option>
-        <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-      </select>
-    </div>
+    <!-- Pure declarative loading engine tied directly to your backend router -->
+    <select 
+      id="packing-country-select"
+      name="country"
+      class="px-3 py-1.5 bg-surface-soft rounded-xl text-xs font-bold text-light border border-border outline-none cursor-pointer"
+      hx-get="/partials/packing/render"
+      hx-target="#packing-content"
+      hx-trigger="change, load"
+      hx-swap="innerHTML">
+      <option value="argentina" selected>🇦🇷 Argentina</option>
+      <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+      <option value="armenia">🇦🇲 Armenia</option>
+      <option value="georgia">🇬🇪 Georgia</option>
+    </select>
+  </div>
 
-    <!-- Main Dynamic Target for Packing Data -->
-    <div id="packing-content">
-      <!-- Loaded dynamically via HTMX -->
-    </div>
-  </main>
+  <!-- Main Dynamic Target for Packing Data -->
+  <div id="packing-content" class="transition-all duration-200">
+    <!-- Server-rendered fragments inject dynamically here -->
+  </div>
+</main>
+
 
 </body>
 </html>

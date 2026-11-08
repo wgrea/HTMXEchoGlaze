@@ -1,138 +1,119 @@
-// /pages/resonance/index.js
+// pages/resonance/index.js
+const express = require('express');
+const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 
-let currentResonanceLevel = 'country';
+// Use your centralized manifest data file as the absolute single source of truth
+const manifestPath = path.join(__dirname, '../../data/manifest.json');
+const countriesDir = path.join(__dirname, '../../data/countries');
 
-// Signal Lookup Table matching Svelte logic
-const resonanceMatches = {
-  nightlifeOverall: ['Argentina'],
-  lateNightDining: ['Argentina', 'Azerbaijan'],
-  drinkingCulture: ['Argentina'],
-  danceScene: ['Argentina'],
-  musicScene: ['Argentina', 'Azerbaijan'],
-  barDensity: ['Argentina'],
-  snowActivities: ['Argentina', 'Azerbaijan'],
-  waterActivities: ['Azerbaijan'],
-  natureAccess: ['Argentina', 'Azerbaijan'],
-  safetyAtNight: ['Azerbaijan']
-};
-
-/**
- * Toggle between 'country' level and 'city' level view modes
- */
-function switchResonanceLevel(level) {
-  currentResonanceLevel = level;
-  const countryBtn = document.getElementById('toggle-country');
-  const cityBtn = document.getElementById('toggle-city');
-  const citySelect = document.getElementById('resonance-city-select');
-  const modeBadge = document.getElementById('active-mode-badge');
-
-  if (level === 'country') {
-    countryBtn.className = "px-3 py-1 rounded-md text-xs font-bold bg-white text-slate-800 shadow-sm";
-    cityBtn.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-600";
-    citySelect.classList.add('d-none');
-    
-    // Update Mode Badge
-    if (modeBadge) {
-      modeBadge.textContent = 'Country Mode';
-      modeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200';
+// Route 1: Pull only verified countries explicitly recorded in the manifest file
+router.get('/country-dropdown-options', (req, res) => {
+  try {
+    if (!fs.existsSync(manifestPath)) {
+      return res.status(500).send('<option value="">Manifest missing</option>');
     }
-  } else {
-    cityBtn.className = "px-3 py-1 rounded-md text-xs font-bold bg-white text-slate-800 shadow-sm";
-    countryBtn.className = "px-3 py-1 rounded-md text-xs font-bold text-slate-600";
-    citySelect.classList.remove('d-none');
-    
-    // Update Mode Badge
-    if (modeBadge) {
-      modeBadge.textContent = 'City Mode';
-      modeBadge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200';
-    }
+
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    let optionsHtml = '';
+    let isFirst = true;
+
+    (manifest.countries || []).forEach(country => {
+      // Cross-verify that a matching javascript file directory actually exists
+      const indexPath = path.join(countriesDir, country.slug, 'index.js');
+      
+      if (fs.existsSync(indexPath)) {
+        optionsHtml += `<option value="${country.slug}" ${isFirst ? 'selected' : ''}>${country.icon || '📍'} ${country.name}</option>`;
+        isFirst = false;
+      }
+    });
+
+    res.send(optionsHtml || '<option value="">No configured countries</option>');
+  } catch (err) {
+    console.error("Failed parsing country list matrix:", err);
+    res.status(500).send('<option value="">Error processing schema</option>');
   }
-  
-  updateResonanceTarget();
-}
-
-/**
- * Filter city options based on selected country
- */
-function handleCountryChange(countrySelect) {
-  const selectedCountry = countrySelect.value;
-  const citySelect = document.getElementById('resonance-city-select');
-  const options = citySelect.options;
-  let firstMatch = null;
-
-  for (let i = 0; i < options.length; i++) {
-    const opt = options[i];
-    if (opt.getAttribute('data-country') === selectedCountry) {
-      opt.classList.remove('d-none');
-      if (!firstMatch) firstMatch = opt;
-    } else {
-      opt.classList.add('d-none');
-    }
-  }
-
-  if (firstMatch) {
-    citySelect.value = firstMatch.value;
-  }
-
-  updateResonanceTarget();
-}
-
-/**
- * Update HTMX target path, hx-select element, and data-mode attribute dynamically
- */
-function updateResonanceTarget() {
-  const countryVal = document.getElementById('resonance-country-select').value;
-  const cityVal = document.getElementById('resonance-city-select').value;
-  const contentArea = document.getElementById('resonance-content');
-
-  // Set attribute for mode-based styling/scripting hooks
-  contentArea.setAttribute('data-mode', currentResonanceLevel);
-
-  if (currentResonanceLevel === 'country') {
-    contentArea.setAttribute('hx-get', `/partials/resonance/countries/${countryVal}.html`);
-    contentArea.setAttribute('hx-select', '#resonance-section');
-  } else {
-    contentArea.setAttribute('hx-get', `/partials/resonance/cities/${cityVal}.html`);
-    contentArea.setAttribute('hx-select', '#city-resonance-section');
-  }
-
-  htmx.process(contentArea);
-  htmx.trigger(contentArea, 'load');
-}
-
-/**
- * Render the Global Matches section for a given signal key
- */
-function showGlobalMatches(signalKey, signalLabel) {
-  const container = document.getElementById('global-matches-container');
-  const matches = resonanceMatches[signalKey] || [];
-  const displayName = signalLabel || signalKey;
-
-  if (matches.length === 0) {
-    container.innerHTML = `
-      <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center">
-        <p class="text-slate-500 italic text-xs">No other destinations match ${displayName} at 7+ intensity.</p>
-      </div>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="p-6 bg-blue-50/50 rounded-2xl border border-blue-200/80 shadow-sm">
-      <h3 class="text-sm font-bold uppercase tracking-wider text-blue-950 mb-3 flex items-center gap-2">
-        <span>🌍</span> Global Matches for <span class="italic text-blue-600">${displayName}</span>
-      </h3>
-      <div class="flex flex-wrap gap-2">
-        ${matches.map(m => `
-          <div class="px-3 py-1.5 bg-white text-slate-800 font-bold rounded-xl text-xs border border-blue-100 shadow-sm flex items-center gap-1.5">
-            <span>📍</span> ${m}
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-}
-
-// Initial initialization on load
-document.addEventListener('DOMContentLoaded', () => {
-  updateResonanceTarget();
 });
+
+// Route 2: Render contextual cities mapped to the selected country's manifest entries
+router.get('/city-dropdown-options', (req, res) => {
+  try {
+    const { country } = req.query;
+    if (!country) return res.send('<option value="">Select country</option>');
+
+    if (!fs.existsSync(manifestPath)) return res.send('');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    // Find the country object by matching slugs
+    const targetCountry = (manifest.countries || []).find(c => c.slug === country.toLowerCase());
+    if (!targetCountry) return res.send('<option value="">Country unlinked</option>');
+
+    // Filter cities matching target parent ID attributes
+    const matchedCities = (manifest.cities || []).filter(city => city.countryId === targetCountry.id);
+    let optionsHtml = '';
+    let isFirst = true;
+
+    matchedCities.forEach(city => {
+      // Format display string syntax (buenos-aires -> Buenos Aires)
+      const name = city.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      optionsHtml += `<option value="${city.slug}" ${isFirst ? 'selected' : ''}>${name}</option>`;
+      isFirst = false;
+    });
+
+    res.send(optionsHtml || '<option value="">No cities configured</option>');
+  } catch (err) {
+    console.error("Failed parsing matching city arrays:", err);
+    res.send('<option value="">Error loading cities</option>');
+  }
+});
+
+module.exports = router;
+
+// Calculate probability matrices and output signals grid layout
+router.get('/calculate', (req, res) => {
+  const { level = 'country', country, city } = req.query;
+  if (!country) return res.send('<p class="text-xs text-slate-400">Select parameter scope.</p>');
+
+  let dataPath = '';
+  if (level === 'country') {
+    dataPath = path.join(countriesDir, country.toLowerCase(), 'index.js');
+  } else {
+    if (!city) return res.send('');
+    dataPath = path.join(countriesDir, country.toLowerCase(), `${city.toLowerCase()}.js`);
+  }
+
+  if (!fs.existsSync(dataPath)) {
+    return res.status(404).send('<p class="text-xs text-red-500">Resonance data source unresolvable.</p>');
+  }
+
+  delete require.cache[require.resolve(dataPath)];
+  const targetData = require(dataPath);
+  const signals = targetData.resonanceSignals || targetData.metrics || {};
+
+  let html = `<div id="resonance-section" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">`;
+
+  Object.keys(signals).forEach(key => {
+    const score = signals[key];
+    // Formats snakeCase parameters into readable labels (e.g., lateNightDining -> Late Night Dining)
+    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+    
+    html += `
+      <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition cursor-pointer"
+           onclick="showGlobalMatches('${key}', '${label}')">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold text-slate-700 tracking-wider">${label}</span>
+          <span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-black rounded text-xs">${score}/10</span>
+        </div>
+        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+          <div class="bg-blue-600 h-full transition-all duration-300" style="width: ${score * 10}%"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  res.send(html);
+});
+
+module.exports = router;

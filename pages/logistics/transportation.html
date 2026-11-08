@@ -1,60 +1,60 @@
-<!-- /pages/logistics/transportation.html -->
-<article id="transportation-page" class="space-y-8 animate-in fade-in duration-300 max-w-6xl mx-auto p-6">
-  
-  <section id="transportation-section" class="bg-surface p-6 rounded-xl border border-border space-y-6">
-    <div class="border-b border-border pb-4">
-      <h3 class="text-xl font-bold flex items-center gap-2">
-        <span>🚗</span> Transportation Strategy
-      </h3>
-      <p class="text-sm text-muted">How locals move — cheapest by day, safest by night.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Transportation | EchoGlaze</title>
+
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+
+  <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.min.js"></script>
+</head>
+
+<body>
+
+<div id="transportation-page-container" class="space-y-6 animate-fadeIn">
+
+  <header class="flex items-center justify-between bg-surface p-4 rounded-xl border border-border shadow-sm mb-6">
+    <div>
+      <h4 class="text-xs font-extrabold uppercase tracking-wider text-light">
+        Transit Context Scope
+      </h4>
+      <p class="text-[11px] text-muted">
+        Toggle destination context for custom logistics networks
+      </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Daytime -->
-      <div class="bg-dark p-4 rounded-lg border border-border space-y-2">
-        <h4 class="font-semibold text-sm flex items-center gap-2 text-primary">🌞 Daytime Mobility</h4>
-        <ul class="text-sm space-y-1 text-muted">
-          <li><strong class="text-light">Default mode:</strong> Subte</li>
-          <li><strong class="text-light">Cheapest mode:</strong> Colectivo (bus)</li>
-          <li><strong class="text-light">Recommended card:</strong> SUBE</li>
-        </ul>
-        <div class="bg-surface/50 p-3 rounded border-l-2 border-primary text-xs mt-3">
-          The <strong>SUBE</strong> card is mandatory and sometimes hard to find—buy it at a "Kiosco".
-        </div>
-      </div>
+    <select
+      hx-get="/partials/transportation/render"
+      hx-target="#transportation-data-mount"
+      hx-trigger="change, load"
+      hx-include="this"
+      name="country"
+      class="px-3 py-1.5 bg-dark rounded-xl text-xs font-bold text-light border border-border outline-none cursor-pointer hover:text-indigo-400 transition-colors"
+    >
+      {{COUNTRY_OPTIONS}}
+    </select>
+  </header>
 
-      <!-- Nighttime -->
-      <div class="bg-dark p-4 rounded-lg border border-border space-y-2">
-        <h4 class="font-semibold text-sm flex items-center gap-2 text-primary">🌙 Nighttime Mobility</h4>
-        <ul class="text-sm space-y-1 text-muted">
-          <li><strong class="text-light">Safest mode:</strong> Ride-hailing</li>
-          <li><strong class="text-light">Recommended apps:</strong> Cabify, Uber</li>
-        </ul>
-        <div class="bg-surface/50 p-3 rounded border-l-2 border-primary text-xs mt-3">
-          <strong>Cabify</strong> is often preferred by locals for safety and fixed pricing.
-        </div>
-      </div>
+  <div class="max-w-6xl mx-auto px-4 py-4">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold text-light tracking-tight mb-2">
+        🚗 Transportation
+      </h1>
+      <p class="text-xs text-muted">
+        How locals move — cheapest by day, safest by night.
+      </p>
     </div>
 
-    <!-- Apps & Intercity -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border">
-      <div class="space-y-2">
-        <h4 class="font-semibold text-sm flex items-center gap-2">📱 Recommended Apps</h4>
-        <ul class="text-sm space-y-1 text-muted">
-          <li><strong class="text-light">Ride-hailing:</strong> Cabify, Uber, Didi</li>
-          <li><strong class="text-light">Transit:</strong> Moovit, Google Maps</li>
-          <li><strong class="text-light">Navigation:</strong> Google Maps</li>
-        </ul>
-      </div>
-      <div class="space-y-2">
-        <h4 class="font-semibold text-sm flex items-center gap-2">🚆 Intercity Travel</h4>
-        <ul class="text-sm space-y-1 text-muted">
-          <li><strong class="text-light">Cheapest:</strong> Bus</li>
-          <li><strong class="text-light">Fastest:</strong> Plane</li>
-          <li><strong class="text-light">Recommended:</strong> Plane (Aerolineas Argentinas)</li>
-        </ul>
-      </div>
+    <div id="transportation-data-mount" class="space-y-6">
     </div>
-  </section>
 
-</article>
+  </div>
+</div>
+
+</body>
+</html>

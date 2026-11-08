@@ -1,16 +1,11 @@
-<!-- pages/resonance/index.html -->
-<script src="/pages/resonance/index.js" defer></script>
-
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   
-  <!-- Navigation Header & Controls Bar -->
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
     <div>
       <div class="flex items-center gap-2">
         <h1 class="text-xl font-black text-slate-800 flex items-center gap-2">
           <span>🌅</span> Resonance Signals
         </h1>
-        <!-- Active Mode Indicator Badge -->
         <span id="active-mode-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200">
           Country Mode
         </span>
@@ -18,54 +13,75 @@
       <p class="text-xs text-slate-500 mt-1">Discover the unique characteristics and energy patterns of destinations</p>
     </div>
 
-    <!-- Controls Group -->
-    <div class="flex items-center gap-3">
-      
-      <!-- Level Toggle -->
-      <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
-        <button type="button" 
-                id="toggle-country" 
-                class="px-3 py-1 rounded-md text-xs font-bold bg-white text-slate-800 shadow-sm" 
-                onclick="switchResonanceLevel('country')">
-          Country
-        </button>
-        <button type="button" 
-                id="toggle-city" 
-                class="px-3 py-1 rounded-md text-xs font-bold text-slate-600" 
-                onclick="switchResonanceLevel('city')">
-          City
-        </button>
-      </div>
+    <!-- Declarative Global Parameters Form -->
+   <!-- Excerpt from pages/resonance/index.html -->
 
-      <!-- Country Selector -->
-      <select id="resonance-country-select" 
-              class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
-              onchange="handleCountryChange(this)">
-        <option value="argentina" selected>🇦🇷 Argentina</option>
-        <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-      </select>
+<!-- Integrated Parameters Control Form -->
+<form id="resonance-control-form" 
+      class="flex items-center gap-3"
+      hx-get="/partials/resonance/calculate" 
+      hx-target="#resonance-content" 
+      hx-trigger="change, load, dependencies-updated">
+  
+  <!-- Granularity Selector Controls -->
+  <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
+    <input type="radio" id="lvl-country" name="level" value="country" checked class="hidden peer/country">
+    <label for="lvl-country" 
+           class="px-3 py-1 rounded-md text-xs font-bold cursor-pointer bg-white text-slate-800 shadow-sm peer-checked/country:bg-white"
+           hx-on:click="
+             document.getElementById('resonance-city-select').classList.add('hidden');
+             document.getElementById('active-mode-badge').textContent = 'Country Mode';
+             document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200';
+           ">
+      Country
+    </label>
 
-      <!-- City Selector -->
-      <select id="resonance-city-select" 
-              class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer d-none"
-              onchange="updateResonanceTarget()">
-        <option value="buenos-aires" data-country="argentina" selected>Buenos Aires (BUE)</option>
-        <option value="baku" data-country="azerbaijan">Baku (BAK)</option>
-      </select>
-
-    </div>
+    <input type="radio" id="lvl-city" name="level" value="city" class="hidden peer/city">
+    <label for="lvl-city" 
+           class="px-3 py-1 rounded-md text-xs font-bold cursor-pointer text-slate-600 peer-checked/city:bg-white"
+           hx-on:click="
+             document.getElementById('resonance-city-select').classList.remove('hidden');
+             document.getElementById('active-mode-badge').textContent = 'City Mode';
+             document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200';
+           ">
+      City
+    </label>
   </div>
 
-  <!-- Dynamic Content Area -->
-  <div id="resonance-content"
-       data-mode="country"
-       hx-get="/partials/resonance/countries/argentina.html"
-       hx-select="#resonance-section"
-       hx-trigger="load"
-       hx-swap="innerHTML">
+<!-- Excerpt from pages/resonance/index.html -->
+
+<!-- Dynamic Country Selector Dropdown -->
+<select id="resonance-country-select" 
+        name="country"
+        class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
+        hx-get="/partials/resonance/country-dropdown-options"
+        hx-target="this"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+        hx-on::after-request="htmx.trigger('#resonance-city-select', 'dependencies-updated');">
+  <!-- Dynamic script options overwrite this container immediately on load -->
+</select>
+
+<!-- Contextual City Selector Dropdown -->
+<select id="resonance-city-select" 
+        name="city"
+        class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer hidden"
+        hx-get="/partials/resonance/city-dropdown-options"
+        hx-target="this"
+        hx-include="[id='resonance-country-select']"
+        hx-trigger="change from:#resonance-country-select, dependencies-updated">
+  <option value="">Select a city</option>
+</select>
+
+</form>
+
   </div>
 
-  <!-- Global Matches Container -->
+  <!-- Dynamic Content Node Block Wrapper -->
+  <div id="resonance-content">
+       <!-- Compiled matching probabilities render cleanly here -->
+  </div>
+
+  <!-- Global Multi-Destination Matches Output View -->
   <div id="global-matches-container" class="mt-8"></div>
-
 </main>

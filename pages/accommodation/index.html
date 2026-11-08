@@ -1,6 +1,4 @@
 <!-- pages/accommodation/index.html -->
-<script src="/pages/accommodation/index.js" defer></script>
-
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
@@ -9,38 +7,70 @@
       <p class="text-xs text-slate-500 mt-1">Explore verified stay options and local food breakdowns</p>
     </div>
 
-    <!-- Global Location Selector -->
-    <div class="flex items-center gap-3">
-      <select id="acc-country-select" class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer" onchange="filterAccommodationCities(this)">
+    <!-- Declarative Global Location Group -->
+    <form class="flex items-center gap-3" id="accommodation-location-form">
+      <!-- Country Dropdown updates City Options AND signals the City Selector to refresh -->
+      <select id="acc-country-select" 
+              name="country" 
+              class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
+              hx-get="/partials/accommodation/city-dropdown-options"
+              hx-target="#acc-city-select"
+              hx-trigger="change"
+              hx-on::after-request="htmx.trigger('#acc-city-select', 'dependencies-updated');">
         <option value="argentina" selected>🇦🇷 Argentina</option>
         <option value="azerbaijan">🇦🇿 Azerbaijan</option>
+        <option value="armenia">🇦🇲 Armenia</option>
+        <option value="georgia">🇬🇪 Georgia</option>
       </select>
 
+      <!-- City Selector explicitly triggers on default load, manual changes, OR country modifications -->
       <select id="acc-city-select" 
+              name="city"
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
-              hx-get="/partials/accommodation/cities/buenos-aires.html"
+              hx-get="/partials/accommodation/render"
               hx-target="#accommodation-content" 
-              hx-select="#stay-options-section, #food-strategy-section"
-              hx-swap="innerHTML"
-              onchange="fetchAccommodationCity(this)">
-        <option value="buenos-aires" data-country="argentina" selected>Buenos Aires (BUE)</option>
-        <option value="baku" data-country="azerbaijan" class="hidden">Baku (BAK)</option>
+              hx-include="[id='acc-country-select'], [id='acc-mode-input']"
+              hx-trigger="change, load, dependencies-updated">
+        <option value="buenos-aires" selected>Buenos Aires (BUE)</option>
       </select>
-    </div>
+    </form>
   </div>
 
-  <!-- Mode Toggle (Stay vs Food Strategy) -->
-  <div class="flex gap-2 mb-6">
-    <button type="button" id="btn-mode-stay" class="px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white" onclick="switchAccMode('stay')">Where to Stay</button>
-    <button type="button" id="btn-mode-food" class="px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600" onclick="switchAccMode('food')">Food Strategy</button>
+  <!-- Mode Toggle Component Framework -->
+  <div class="flex gap-2 mb-6" id="mode-toggle-form">
+    <input type="hidden" id="acc-mode-input" name="mode" value="stay">
+    
+    <button type="button" 
+            id="btn-mode-stay" 
+            class="px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white" 
+            hx-get="/partials/accommodation/render"
+            hx-target="#accommodation-content"
+            hx-include="[id='acc-country-select'], [id='acc-city-select']"
+            hx-vals='{"mode": "stay"}'
+            hx-on::after-request="
+              document.getElementById('acc-mode-input').value = 'stay';
+              this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
+              document.getElementById('btn-mode-food').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
+            ">
+      Where to Stay
+    </button>
+    <button type="button" 
+            id="btn-mode-food" 
+            class="px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600"
+            hx-get="/partials/accommodation/render"
+            hx-target="#accommodation-content"
+            hx-include="[id='acc-country-select'], [id='acc-city-select']"
+            hx-vals='{"mode": "food"}'
+            hx-on::after-request="
+              document.getElementById('acc-mode-input').value = 'food';
+              this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
+              document.getElementById('btn-mode-stay').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
+            ">
+      Food Strategy
+    </button>
   </div>
 
-  <!-- Content Container (Loads city accommodation/food partials) -->
-  <div id="accommodation-content" 
-       hx-get="/partials/accommodation/cities/buenos-aires.html"
-       hx-select="#stay-options-section, #food-strategy-section"
-       hx-trigger="load" 
-       hx-swap="innerHTML">
-    <!-- Partial stay/food sections load here -->
+  <div id="accommodation-content" hx-swap="innerHTML">
+    <!-- Server fragments handle data mapping cleanly here -->
   </div>
 </main>
