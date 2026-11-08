@@ -1,6 +1,5 @@
-/* partials/logistics/argentian.js */
+/* partials/logistics/argentina.js */
 module.exports = {
-  id: 'ARG',
   name: 'Argentina',
   region: 'South America',
   icon: '🇦🇷',
@@ -12,7 +11,11 @@ module.exports = {
       workPolicy: "Transit residence status; local employment strictly prohibited.",
       registrationAfterDays: 0,
     },
-    seasonality: { cheapest: [6, 7, 8], sweetSpot: [10, 11, 3, 4], peak: [12, 1, 2] }
+    seasonality: { 
+      cheapest: [6, 7, 8], 
+      sweetSpot: [3, 4, 10, 11], 
+      peak: [1, 2, 12], 
+      neutral: [5, 9] 
+    }
   }
-  // ... rest of object
 };
