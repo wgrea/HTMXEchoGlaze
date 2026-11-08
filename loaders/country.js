@@ -1,32 +1,60 @@
-/* loaders/country.js */
+// loaders/country.js
+const fs = require('fs');
 const path = require('path');
-const ROOT_DIR = path.resolve(__dirname, '../');
 
-const COUNTRY_REGISTRY = [
-  { id: 'ARG', slug: 'argentina', data: require(path.join(ROOT_DIR, 'partials/logistics/argentina')) },
-  { id: 'AZE', slug: 'azerbaijan', data: require(path.join(ROOT_DIR, 'partials/logistics/azerbaijan')) }
-];
+const countriesDir = path.join(__dirname, '../data/countries');
 
-function normalizeCountry(entry) {
-  const data = entry.data.default || entry.data;
-  return {
-    ...data,
-    id: entry.id,
-    slug: entry.slug,
-    name: data.name || entry.slug.charAt(0).toUpperCase() + entry.slug.slice(1),
-    region: data.region || 'N/A',
-    icon: data.icon || (entry.id === 'ARG' ? '🇦🇷' : '🇦🇿'),
-  };
-}
+const loadCountries = () => {
+  if (!fs.existsSync(countriesDir)) return [];
+  
+  const entries = fs.readdirSync(countriesDir, { withFileTypes: true });
+  const countriesList = [];
 
-function loadCountry(id) {
-  const normalizedId = id.toLowerCase();
-  const entry = COUNTRY_REGISTRY.find(c => c.slug === normalizedId || c.id.toLowerCase() === normalizedId);
-  return entry ? normalizeCountry(entry) : null;
-}
+  for (const entry of entries) {
+    // Check if it's a directory (e.g., 'argentina', 'azerbaijan')
+    if (entry.isDirectory()) {
+      const slug = entry.name;
+      const indexPath = path.join(countriesDir, slug, 'index.js');
+      
+      if (fs.existsSync(indexPath)) {
+        try {
+          // Clear require cache if you want hot-reloading during dev, 
+          // or just standard require:
+          const countryData = require(indexPath);
+          
+          countriesList.push({
+            slug,
+            ...countryData
+          });
+        } catch (err) {
+          console.error(`Error loading country index for ${slug}:`, err);
+        }
+      }
+    }
+  }
+  return countriesList;
+};
 
-function loadCountries() {
-  return COUNTRY_REGISTRY.map(entry => normalizeCountry(entry)).filter(Boolean);
-}
+const loadCountry = (slug) => {
+  if (!slug) return null;
+  const cleanSlug = slug.toLowerCase().trim();
+  const indexPath = path.join(countriesDir, cleanSlug, 'index.js');
+  
+  if (!fs.existsSync(indexPath)) return null;
+  
+  try {
+    const countryData = require(indexPath);
+    return {
+      slug: cleanSlug,
+      ...countryData
+    };
+  } catch (err) {
+    console.error(`Error loading country file for slug ${slug}:`, err);
+    return null;
+  }
+};
 
-module.exports = { loadCountry, loadCountries, COUNTRY_REGISTRY };
+module.exports = {
+  loadCountries,
+  loadCountry
+};
