@@ -17,7 +17,6 @@ const loadCountries = () => {
       
       if (fs.existsSync(indexPath)) {
         try {
-          // Keep cache flushed for predictable hot reloading in local development
           delete require.cache[require.resolve(indexPath)];
           const countryData = require(indexPath);
           
@@ -26,7 +25,6 @@ const loadCountries = () => {
             ...countryData
           });
         } catch (err) {
-          // Log clean system indicators without polluting standard streams
           console.error(`[System Error] Failed to require index for ${slug}:`, err.message);
         }
       }
@@ -55,7 +53,44 @@ const loadCountry = (slug) => {
   }
 };
 
+/** ⭐ Shared Options Fragment Builder for Country Selectors */
+const getCountryDropdownOptions = (selectedSlug = 'argentina') => {
+  const activeCountries = loadCountries();
+  return activeCountries.map(country => {
+    const countryValue = (country.slug || '').toLowerCase().trim();
+    const countryName = country.name || countryValue;
+    const countryIcon = country.icon || '📍';
+    const isSelected = countryValue === selectedSlug.toLowerCase().trim();
+    
+    return `<option value="${countryValue}" ${isSelected ? 'selected' : ''}>${countryIcon} ${countryName}</option>`;
+  }).join('\n');
+};
+
+/** ⭐ New Helper: Scan disk layout for custom city sub-modules */
+const loadCitiesForCountry = (countrySlug) => {
+  if (!countrySlug) return [];
+  const cleanSlug = countrySlug.toLowerCase().trim();
+  const targetDir = path.join(countriesDir, cleanSlug);
+
+  if (!fs.existsSync(targetDir)) return [];
+
+  return fs.readdirSync(targetDir)
+    .filter(file => file !== 'index.js' && (file.endsWith('.js') || file.endsWith('.ts')))
+    .map(file => {
+      const citySlug = file.replace(/\.(js|ts)$/, '');
+      // Format to human readable (e.g. buenos-aires -> Buenos Aires)
+      const cityName = citySlug
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      return { slug: citySlug, name: cityName };
+    });
+};
+
 module.exports = {
   loadCountries,
-  loadCountry
+  loadCountry,
+  getCountryDropdownOptions,
+  loadCitiesForCountry
 };

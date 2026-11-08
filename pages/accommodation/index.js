@@ -3,36 +3,32 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const { loadCitiesForCountry } = require('../../loaders/country'); // Connect directly to filesystem loader helper
 
 const countriesDir = path.join(__dirname, '../../data/countries');
 
-// Add this modification specifically inside your router.get('/city-dropdown-options') route:
-
+// Route 1: Dynamically render options element list via loader file scan
 router.get('/city-dropdown-options', (req, res) => {
-  const { country } = req.query;
-  if (!country) return res.send('');
+  const countrySlug = req.query.country;
+  if (!countrySlug) return res.send('<option value="">Select a city</option>');
 
-  const countryPath = path.join(countriesDir, country.toLowerCase());
-  let optionsHtml = '';
-  let isFirst = true;
+  try {
+    const cities = loadCitiesForCountry(countrySlug);
 
-  if (fs.existsSync(countryPath)) {
-    const files = fs.readdirSync(countryPath);
-    files.forEach(file => {
-      if (file.endsWith('.js') && file !== 'index.js') {
-        const citySlug = file.replace('.js', '');
-        const cityName = citySlug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        
-        // Explicitly inject the selected marker to the first available city option
-        optionsHtml += `<option value="${citySlug}" ${isFirst ? 'selected' : ''}>${cityName}</option>`;
-        isFirst = false;
-      }
-    });
+    if (cities.length === 0) {
+      return res.send('<option value="">No cities found</option>');
+    }
+
+    const optionsHtml = cities.map((city, index) => {
+      const isFirst = index === 0;
+      return `<option value="${city.slug}" ${isFirst ? 'selected' : ''}>${city.name}</option>`;
+    }).join('\n');
+
+    res.send(optionsHtml);
+  } catch (err) {
+    res.send('<option value="">No cities found</option>');
   }
-
-  res.send(optionsHtml || '<option value="">No cities found</option>');
 });
-
 
 // Route 2: Render stay options array or food strategy guides based on mode parameters
 router.get('/render', (req, res) => {
@@ -41,7 +37,7 @@ router.get('/render', (req, res) => {
     return res.send('<p class="text-xs text-slate-400 italic">Select a target location.</p>');
   }
 
-  const cityFilePath = path.join(countriesDir, country.toLowerCase(), `${city.toLowerCase()}.js`);
+  const cityFilePath = path.join(countriesDir, country.toLowerCase().trim(), `${city.toLowerCase().trim()}.js`);
 
   if (!fs.existsSync(cityFilePath)) {
     return res.status(404).send('<p class="text-xs text-red-500">City location registry unresolvable.</p>');
@@ -52,12 +48,13 @@ router.get('/render', (req, res) => {
   const cityData = require(cityFilePath);
 
   if (mode === 'stay') {
-    // Aligned to read cityData.stayOptions directly from data files
     const stays = cityData.stayOptions || [];
     let html = '<div id="stay-options-section" class="grid grid-cols-1 md:grid-cols-2 gap-4">';
     
     stays.forEach(stay => {
       const wifiBadge = stay.verifiedWifi ? '<span class="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded border border-emerald-200">WIFI VERIFIED</span>' : '';
+      const amenities = Array.isArray(stay.amenities) ? stay.amenities : [];
+      const starsCount = Math.max(1, Math.min(5, parseInt(stay.priceTier) || 1));
       
       html += `
         <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
@@ -68,10 +65,10 @@ router.get('/render', (req, res) => {
             </div>
             <p class="text-[11px] text-slate-400 font-medium uppercase tracking-wide mt-1">Tone: ${stay.socialTone || 'Balanced'}</p>
             <div class="flex flex-wrap gap-1 mt-2">
-              ${(stay.amenities || []).map(a => `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded">${a}</span>`).join('')}
+              ${amenities.map(a => `<span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded">${a}</span>`).join('')}
             </div>
           </div>
-          <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-black text-indigo-600">PRICE TIER: ${'★'.repeat(stay.priceTier || 1)}</div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-black text-indigo-600">PRICE TIER: ${'★'.repeat(starsCount)}</div>
         </div>
       `;
     });
@@ -79,7 +76,6 @@ router.get('/render', (req, res) => {
     html += '</div>';
     res.send(stays.length ? html : '<p class="text-xs text-slate-400 italic">No stay profiles verified for this city.</p>');
   } else {
-    // Aligned to map your custom breakfast, lunch, and dinner node objects
     const strategy = cityData.foodStrategy || {};
     res.send(`
       <div id="food-strategy-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">

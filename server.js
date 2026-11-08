@@ -2,25 +2,21 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const { loadCountries, getCountryDropdownOptions } = require('./loaders/country');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // =========================================================
-// 1. STATIC ASSET SCRIPTS & FRAMEWORKS
+// 1. STATIC ASSETS & MIDDLEWARE
 // =========================================================
-app.get('/htmx.min.js', (req, res) => {
-  res.setHeader('Content-Type', 'application/javascript');
-  res.sendFile(path.join(__dirname, 'htmx.min.js'));
-});
-
-// Serve styles and static content cleanly
 app.use('/css', express.static(path.join(__dirname, 'css')));
+// Serve root folder static assets safely (handles static .html, client scripts, icons)
 app.use(express.static(__dirname));
 
-// ==========================================
+// =========================================================
 // 2. DYNAMIC ROUTERS & PARTIAL ENDPOINTS
-// ==========================================
+// =========================================================
 app.use('/partials/transportation', require('./pages/logistics/transportation.js'));
 app.use('/partials/accommodation', require('./pages/accommodation/index'));
 app.use('/partials/resonance', require('./pages/resonance/index'));
@@ -29,44 +25,66 @@ app.use('/partials/packing', require('./pages/packing/index'));
 const logisticsRouter = require('./pages/logistics/index');
 app.use('/api/logistics', logisticsRouter);
 
-// ==========================================
-// 3. EXPLICIT CORE PAGE Handlers
-// ==========================================
+// Global endpoint to serve uniform options lists to any selector page
+app.get('/partials/global/country-options', (req, res) => {
+  const selectedCountry = req.query.country || 'argentina';
+  res.send(getCountryDropdownOptions(selectedCountry));
+});
+
+// =========================================================
+// 3. EXPLICIT PAGE & COMPONENT HANDLERS
+// =========================================================
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// server.js (Inside your app.get('/transportation') handler)
+// --- Transportation Shell Handler ---
 app.get('/transportation', (req, res) => {
   try {
-    const manifestPath = path.join(__dirname, 'data', 'manifest.json');
-    const parsedManifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-    const COUNTRY_REGISTRY = parsedManifest.countries || [];
-
-    const generatedOptions = COUNTRY_REGISTRY.map(country => {
-      const countryValue = (country.slug || country.id || '').toLowerCase().trim();
-      const countryName = country.name || '';
-      const countryIcon = country.icon || '📍';
-      // Default Argentina onto the view layout
-      const isArgentinaDefault = countryValue === 'argentina';
-      
-      return `<option value="${countryValue}" ${isArgentinaDefault ? 'selected' : ''}>${countryIcon} ${countryName}</option>`;
-    }).join('\n');
-
-    // Read your inner layout fragment shell file from disk
     const fragmentPath = path.join(__dirname, 'pages/logistics', 'transportation.html');
+    if (!fs.existsSync(fragmentPath)) {
+      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Core System Files</p>');
+    }
+
+    const generatedOptions = getCountryDropdownOptions('argentina');
     let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
-
-    // Cleanly swap out tokens into the markup shell wrapper
-    baseShell = baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions);
-
-    return res.send(baseShell);
+    return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
   } catch (err) {
-    console.error("Failed to compile layout wrapper:", err);
-    res.status(500).send('<p class="text-xs text-red-400">Internal Server Error.</p>');
+    res.status(500).send('<p class="text-xs text-red-400 font-mono">Layout compilation runtime crash</p>');
   }
 });
 
+// --- Accommodation Shell Handler ---
+app.get('/accommodation', (req, res) => {
+  try {
+    const fragmentPath = path.join(__dirname, 'pages/accommodation', 'index.html');
+    if (!fs.existsSync(fragmentPath)) {
+      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Accommodation Shell File</p>');
+    }
+
+    const generatedOptions = getCountryDropdownOptions('argentina');
+    let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
+    return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
+  } catch (err) {
+    res.status(500).send('<p class="text-xs text-red-400 font-mono">Failed to compile Accommodation wrapper</p>');
+  }
+});
+
+// --- Packing Shell Handler ---
+app.get('/packing', (req, res) => {
+  try {
+    const fragmentPath = path.join(__dirname, 'pages/packing', 'index.html');
+    if (!fs.existsSync(fragmentPath)) {
+      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Packing Shell File</p>');
+    }
+
+    const generatedOptions = getCountryDropdownOptions('argentina');
+    let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
+    return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
+  } catch (err) {
+    res.status(500).send('<p class="text-xs text-red-400 font-mono">Failed to compile Packing wrapper</p>');
+  }
+});
 
 app.get('/components/:name', (req, res) => {
   const componentName = req.params.name.replace('.html', '');
@@ -78,9 +96,9 @@ app.get('/components/:name', (req, res) => {
   res.status(404).send('Component partial not found');
 });
 
-// ==========================================
-// 4. INIT LISTEN RUNTIME
-// ==========================================
+// =========================================================
+// 4. RUNTIME SETUP
+// =========================================================
 app.listen(PORT, () => {
   console.log(`🚀 EchoGlaze running at http://localhost:${PORT}`);
 });

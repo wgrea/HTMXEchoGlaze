@@ -1,19 +1,4 @@
 <!-- pages/packing/index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Packing Strategy & Loadout | EchoGlaze</title>
-  <link rel="stylesheet" href="../css/tokens.css">
-  <link rel="stylesheet" href="../css/layout.css">
-  <link rel="stylesheet" href="../css/components.css">
-  <link rel="stylesheet" href="../css/animations.css">
-  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-</head>
-<body class="bg-dark text-light font-sans antialiased">
-
-<!-- pages/packing/index.html -->
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   <!-- Header Control Bar -->
   <div class="mb-6 flex items-center justify-between bg-surface p-4 rounded-2xl border border-border shadow-sm">
@@ -21,28 +6,25 @@
       <span>🎒</span> Packing Strategy & Gear Loadout
     </h1>
 
-    <!-- Pure declarative loading engine tied directly to your backend router -->
+    <!-- Pure declarative loading engine tied directly to global country registry -->
     <select 
       id="packing-country-select"
       name="country"
       class="px-3 py-1.5 bg-surface-soft rounded-xl text-xs font-bold text-light border border-border outline-none cursor-pointer"
-      hx-get="/partials/packing/render"
-      hx-target="#packing-content"
-      hx-trigger="change, load"
-      hx-swap="innerHTML">
-      <option value="argentina" selected>🇦🇷 Argentina</option>
-      <option value="azerbaijan">🇦🇿 Azerbaijan</option>
-      <option value="armenia">🇦🇲 Armenia</option>
-      <option value="georgia">🇬🇪 Georgia</option>
+      hx-get="/partials/global/country-options"
+      hx-trigger="load"
+      hx-target="this"
+      hx-swap="innerHTML"
+      hx-on:change="htmx.trigger('#packing-content', 'load-packing')">
     </select>
   </div>
 
   <!-- Main Dynamic Target for Packing Data -->
-  <div id="packing-content" class="transition-all duration-200">
-    <!-- Server-rendered fragments inject dynamically here -->
+  <div id="packing-content" 
+       hx-get="/partials/packing/render"
+       hx-trigger="load from:#packing-country-select, load-packing"
+       hx-include="[id='packing-country-select']"
+       class="transition-all duration-200">
+       <p class="text-xs text-slate-400 italic">Assembling inventory models...</p>
   </div>
 </main>
-
-
-</body>
-</html>
