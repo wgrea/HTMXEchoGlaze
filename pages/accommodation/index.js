@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const { loadCitiesForCountry } = require('../../loaders/country'); // Connect directly to filesystem loader helper
+const { loadCitiesForCountry } = require('../../loaders/country');
 
 const countriesDir = path.join(__dirname, '../../data/countries');
 
@@ -37,7 +37,11 @@ router.get('/render', (req, res) => {
     return res.send('<p class="text-xs text-slate-400 italic">Select a target location.</p>');
   }
 
-  const cityFilePath = path.join(countriesDir, country.toLowerCase().trim(), `${city.toLowerCase().trim()}.js`);
+  // Handle both .js and .ts layouts safely by checking for either extension
+  let cityFilePath = path.join(countriesDir, country.toLowerCase().trim(), `${city.toLowerCase().trim()}.js`);
+  if (!fs.existsSync(cityFilePath)) {
+    cityFilePath = path.join(countriesDir, country.toLowerCase().trim(), `${city.toLowerCase().trim()}.ts`);
+  }
 
   if (!fs.existsSync(cityFilePath)) {
     return res.status(404).send('<p class="text-xs text-red-500">City location registry unresolvable.</p>');
@@ -49,7 +53,7 @@ router.get('/render', (req, res) => {
 
   if (mode === 'stay') {
     const stays = cityData.stayOptions || [];
-    let html = '<div id="stay-options-section" class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+    let html = '<div id="stay-options-section" class="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fadeIn">';
     
     stays.forEach(stay => {
       const wifiBadge = stay.verifiedWifi ? '<span class="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded border border-emerald-200">WIFI VERIFIED</span>' : '';
@@ -77,27 +81,40 @@ router.get('/render', (req, res) => {
     res.send(stays.length ? html : '<p class="text-xs text-slate-400 italic">No stay profiles verified for this city.</p>');
   } else {
     const strategy = cityData.foodStrategy || {};
+    
+    // Safely render any key structure (supports either raw strings or object blocks)
+    const renderMealBlock = (mealData) => {
+      if (!mealData) return 'N/A';
+      if (typeof mealData === 'string') return mealData;
+      
+      return `
+        <p class="text-xs font-bold text-slate-800 mt-1">${mealData.bestValue || 'N/A'}</p>
+        <p class="text-[11px] text-slate-500 mt-0.5 italic">Cheapest: ${mealData.cheapest || 'N/A'}</p>
+      `;
+    };
+
     res.send(`
-      <div id="food-strategy-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div id="food-strategy-section" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden animate-fadeIn">
         <div class="p-4 bg-slate-50 border-b border-slate-200">
           <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5"><span>🍽️</span> Local Meals & Sourcing Strategy</h3>
         </div>
         <div class="p-5 space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Breakfast</span>
-              <p class="text-xs font-bold text-slate-800 mt-1">${strategy.breakfast?.bestValue || 'N/A'}</p>
-              <p class="text-[11px] text-slate-500 mt-0.5 italic">Cheapest: ${strategy.breakfast?.cheapest || 'N/A'}</p>
+              ${renderMealBlock(strategy.breakfast)}
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Lunch</span>
-              <p class="text-xs font-bold text-slate-800 mt-1">${strategy.lunch?.bestValue || 'N/A'}</p>
-              <p class="text-[11px] text-slate-500 mt-0.5 italic">Cheapest: ${strategy.lunch?.cheapest || 'N/A'}</p>
+              ${renderMealBlock(strategy.lunch)}
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Dinner</span>
-              <p class="text-xs font-bold text-slate-800 mt-1">${strategy.dinner?.bestValue || 'N/A'}</p>
-              <p class="text-[11px] text-slate-500 mt-0.5 italic">Cheapest: ${strategy.dinner?.cheapest || 'N/A'}</p>
+              ${renderMealBlock(strategy.dinner)}
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Dessert & Sweets</span>
+              ${renderMealBlock(strategy.dessert)}
             </div>
           </div>
           ${strategy.healthyCheap ? `
