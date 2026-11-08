@@ -1,2 +1,4 @@
-Instant Node Server: npx serve 
+Instant Node Server: 
+1. Stop-Process -Id (Get-NetTcpConnection -LocalPort 3000).OwningProcess -Force
+2. npx nodemon server.js
 File directory tree: tree /f 
