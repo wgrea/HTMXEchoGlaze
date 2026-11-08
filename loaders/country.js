@@ -11,15 +11,14 @@ const loadCountries = () => {
   const countriesList = [];
 
   for (const entry of entries) {
-    // Check if it's a directory (e.g., 'argentina', 'azerbaijan')
     if (entry.isDirectory()) {
       const slug = entry.name;
       const indexPath = path.join(countriesDir, slug, 'index.js');
       
       if (fs.existsSync(indexPath)) {
         try {
-          // Clear require cache if you want hot-reloading during dev, 
-          // or just standard require:
+          // Keep cache flushed for predictable hot reloading in local development
+          delete require.cache[require.resolve(indexPath)];
           const countryData = require(indexPath);
           
           countriesList.push({
@@ -27,7 +26,8 @@ const loadCountries = () => {
             ...countryData
           });
         } catch (err) {
-          console.error(`Error loading country index for ${slug}:`, err);
+          // Log clean system indicators without polluting standard streams
+          console.error(`[System Error] Failed to require index for ${slug}:`, err.message);
         }
       }
     }
@@ -43,13 +43,14 @@ const loadCountry = (slug) => {
   if (!fs.existsSync(indexPath)) return null;
   
   try {
+    delete require.cache[require.resolve(indexPath)];
     const countryData = require(indexPath);
     return {
       slug: cleanSlug,
       ...countryData
     };
   } catch (err) {
-    console.error(`Error loading country file for slug ${slug}:`, err);
+    console.error(`[System Error] Resolution failure on country slug: ${slug}`, err.message);
     return null;
   }
 };
