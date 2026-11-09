@@ -9,7 +9,8 @@
 
     <!-- Declarative Unified Location Control Group -->
     <form class="flex items-center gap-3" id="accommodation-location-form" onsubmit="return false;">
-      <!-- Country Dropdown: Populates city choices AND forces content updates safely -->
+      
+      <!-- Country Dropdown: Populates city dropdown box options list AND immediately clears out stale panels with interstitial layout -->
       <select id="acc-country-select" 
               name="country" 
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
@@ -18,66 +19,43 @@
               hx-target="this"
               hx-swap="innerHTML"
               hx-on:change="
-                htmx.ajax('GET', '/partials/accommodation/city-dropdown-options', {
-                  target: '#acc-city-select', 
-                  values: { country: this.value }
-                }).then(() => {
-                  htmx.trigger('#accommodation-content', 'load-data');
-                });
+                document.getElementById('accommodation-content').innerHTML = '<div class=\'p-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center\'><p class=\'text-xs text-slate-400 italic flex items-center justify-center gap-2\'><span>🔄</span> Syncing data pipelines for ' + this.options[this.selectedIndex].text + '...</p></div>';
+                htmx.trigger('#acc-city-select', 'fetch-cities');
               ">
         <option value="argentina">Loading Registry...</option>
       </select>
 
-      <!-- City Selector: Explicitly handles parent reloads with full index dependencies -->
+      <!-- City Selector: Explicitly gates downstream panel data painting until after DOM renders choices -->
       <select id="acc-city-select" 
               name="city"
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
               hx-get="/partials/accommodation/city-dropdown-options"
-              hx-trigger="load from:#acc-country-select"
+              hx-trigger="load from:#acc-country-select delay:50ms, fetch-cities"
               hx-target="this" 
-              hx-include="[id='acc-country-select']"
+              hx-include="#acc-country-select"
               hx-swap="innerHTML"
+              hx-on::after-on-load="htmx.trigger('#accommodation-content', 'load-data')"
               hx-on:change="htmx.trigger('#accommodation-content', 'load-data')">
         <option value="">Select a city</option>
       </select>
     </form>
   </div>
 
-  <!-- Mode Toggle Component Framework (Mirrors Resonance Level Toggle Styles) -->
+  <!-- Mode Toggles -->
   <div class="flex gap-2 mb-6" id="mode-toggle-form">
     <input type="hidden" id="acc-mode-input" name="mode" value="stay">
-    
-    <button type="button" 
-            id="btn-mode-stay" 
-            class="px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white" 
-            hx-on:click="
-              document.getElementById('acc-mode-input').value = 'stay';
-              this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
-              document.getElementById('btn-mode-food').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
-              htmx.trigger('#accommodation-content', 'load-data');
-            ">
-      Where to Stay
-    </button>
-    
-    <button type="button" 
-            id="btn-mode-food" 
-            class="px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600"
-            hx-on:click="
-              document.getElementById('acc-mode-input').value = 'food';
-              this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
-              document.getElementById('btn-mode-stay').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
-              htmx.trigger('#accommodation-content', 'load-data');
-            ">
-      Food Strategy
-    </button>
+    <button type="button" id="btn-mode-stay" class="px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white" hx-on:click="document.getElementById('acc-mode-input').value = 'stay'; this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white'; document.getElementById('btn-mode-food').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600'; htmx.trigger('#accommodation-content', 'load-data');">Where to Stay</button>
+    <button type="button" id="btn-mode-food" class="px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600" hx-on:click="document.getElementById('acc-mode-input').value = 'food'; this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white'; document.getElementById('btn-mode-stay').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600'; htmx.trigger('#accommodation-content', 'load-data');">Food Strategy</button>
   </div>
 
   <!-- Central Processing Mount Target Area -->
   <div id="accommodation-content" 
        hx-get="/partials/accommodation/render"
-       hx-trigger="load, load-data"
+       hx-trigger="load delay:250ms, load-data"
        hx-include="#accommodation-location-form, [id='acc-mode-input']"
        hx-swap="innerHTML">
-    <p class="text-xs text-slate-400 italic">Select location parameters to mount template logs...</p>
+    <div class="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center">
+      <p class="text-xs text-slate-400 italic">Assembling regional information arrays...</p>
+    </div>
   </div>
 </main>

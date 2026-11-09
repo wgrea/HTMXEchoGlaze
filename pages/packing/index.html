@@ -6,7 +6,7 @@
       <span>🎒</span> Packing Strategy & Gear Loadout
     </h1>
 
-    <!-- Pure declarative loading engine tied directly to global country registry -->
+    <!-- FIXED: Fires a transparent post/get cascade directly to the target panel layout -->
     <select 
       id="packing-country-select"
       name="country"
@@ -20,10 +20,11 @@
   </div>
 
   <!-- Main Dynamic Target for Packing Data -->
+  <!-- FIXED: Sequential delay blocks prevent first paint layout resets -->
   <div id="packing-content" 
        hx-get="/partials/packing/render"
-       hx-trigger="load from:#packing-country-select, load-packing"
-       hx-include="[id='packing-country-select']"
+       hx-trigger="load delay:100ms, load-packing"
+       hx-include="#packing-country-select"
        class="transition-all duration-200">
        <p class="text-xs text-slate-400 italic">Assembling inventory models...</p>
   </div>

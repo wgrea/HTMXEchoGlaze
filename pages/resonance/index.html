@@ -93,11 +93,15 @@
     </form>
   </div>
 
-  <!-- Central Processing Mount Target (Cleaned of infinite trigger loops) -->
-  <div id="resonance-content" 
-       hx-get="/partials/resonance/calculate"
-       hx-trigger="load, load-data"
-       hx-include="[id='res-level-input'], [id='res-country-select'], [id='res-city-select']"
-       hx-swap="innerHTML">
-  </div>
+<!-- Central Processing Mount Target Area -->
+<!-- FIXED: Removed the instant 'load' trigger to prevent race conditions. It now triggers safely after dependencies load or explicit changes occur -->
+<div id="resonance-content" 
+     hx-get="/partials/resonance/calculate"
+     hx-trigger="dependencies-updated from:#res-city-select, load-data"
+     hx-include="#resonance-location-form"
+     hx-swap="innerHTML">
+  <p class="text-xs text-slate-400 italic p-4">Aligning resonance calculation arrays...</p>
+</div>
+
+
 </main>

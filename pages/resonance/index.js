@@ -17,13 +17,15 @@ router.get('/country-dropdown-options', (req, res) => {
       return res.status(500).send('<option value="">Manifest missing</option>');
     }
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    
+    // Check persistent state first
+    const activeCountry = req.session?.selectedCountry || 'argentina';
+    
     let html = '';
-    let isFirst = true;
-
     (manifest.countries || []).forEach(c => {
       if (fs.existsSync(path.join(countriesDir, c.slug, 'index.js'))) {
-        html += `<option value="${c.slug}" ${isFirst ? 'selected' : ''}>${c.icon || '📍'} ${c.name}</option>`;
-        isFirst = false;
+        const isSelected = c.slug === activeCountry ? 'selected' : '';
+        html += `<option value="${c.slug}" ${isSelected}>${c.icon || '📍'} ${c.name}</option>`;
       }
     });
     res.send(html || '<option value="">No configured countries</option>');
@@ -36,26 +38,37 @@ router.get('/country-dropdown-options', (req, res) => {
 // Route 2: Render contextual cities
 router.get('/city-dropdown-options', (req, res) => {
   try {
-    const { country } = req.query;
-    console.log(`\n[DEBUG] Fetching cities for country: "${country}"`);
+    let { country } = req.query;
     
-    if (!country) return res.send('<option value="">Select country</option>');
+    // FIX: Fallback directly to active dynamic session tracker if missing from query params
+    if (!country || country === 'undefined') {
+      country = req.session?.selectedCountry || 'argentina';
+    } else {
+      country = country.toLowerCase().trim();
+      if (req.session.selectedCountry !== country) {
+        req.session.selectedCountry = country;
+        req.session.selectedCity = null; // Clear out of bounds city references on country update
+      }
+    }
 
     const cities = loadCitiesForCountry(country);
-    console.log(`[DEBUG] Cities array found via loader:`, cities);
 
     if (!cities || cities.length === 0) {
-      console.warn(`[DEBUG] No cities arrays resolved for country shortcut node: ${country}`);
       return res.send('<option value="">No cities configured</option>');
     }
 
+    const currentActiveCity = req.session?.selectedCity;
+
     const html = cities.map((city, index) => {
-      const isSelected = index === 0 ? 'selected' : '';
-      console.log(`[DEBUG] Mapping option -> name: ${city.name}, slug: ${city.slug}, active: ${index === 0}`);
-      return `<option value="${city.slug}" ${isSelected}>${city.name}</option>`;
+      // Prioritize the persistent session city, otherwise fall back to the first available city index
+      const isSelected = currentActiveCity 
+        ? currentActiveCity === city.slug 
+        : index === 0;
+        
+      return `<option value="${city.slug}" ${isSelected ? 'selected' : ''}>${city.name}</option>`;
     }).join('\n');
 
-    // ⚡ Tell HTMX to automatically recalculate the dashboard with the newly selected first city
+    // Inform HTMX that it can safely compute data layers now that city select array is built
     res.setHeader('HX-Trigger', 'dependencies-updated');
     res.send(html);
   } catch (err) {
@@ -65,37 +78,54 @@ router.get('/city-dropdown-options', (req, res) => {
 });
 
 // Route 3: Core Calculator & Calculation Pipeline
-// ⚡ inside pages/resonance/index.js -> router.get('/calculate', ...)
 router.get('/calculate', (req, res) => {
   try {
     let { level = 'country', country, city, selectedSignalKey, selectedSignalLabel } = req.query;
 
-    // Fix the 500 Error: Flatten array parameters caused by HTMX duplication drops
+    // Flatten duplicate query array injections
     if (Array.isArray(level)) level = level[0];
     if (Array.isArray(country)) country = country[0];
     if (Array.isArray(city)) city = city[0];
     if (Array.isArray(selectedSignalKey)) selectedSignalKey = selectedSignalKey[0];
     if (Array.isArray(selectedSignalLabel)) selectedSignalLabel = selectedSignalLabel[0];
 
+    // Mutate and sync global state
+    if (country) {
+      country = country.toLowerCase().trim();
+      if (req.session.selectedCountry !== country) {
+        req.session.selectedCountry = country;
+        req.session.selectedCity = null;
+      }
+    } else {
+      country = req.session?.selectedCountry || 'argentina';
+    }
+
+    if (city && city !== 'undefined' && city.trim() !== '') {
+      city = city.toLowerCase().trim();
+      req.session.selectedCity = city;
+    } else if (level === 'city') {
+      city = req.session?.selectedCity;
+    }
+
     if (!country) return res.send('<p class="text-xs text-slate-400 p-4">Select parameter scope.</p>');
 
-    // ⚡ FIX THE 404 TRAP: Validate city context belongs to the active country folder map
+    // Validate city context mapping sequence
     if (level === 'city') {
       const cities = loadCitiesForCountry(country);
       const cityListSlugs = cities.map(c => c.slug);
       
-      // If city is completely blank OR belongs to a different country (e.g., country=spain, city=cdmx)
-      if (!city || city.trim() === '' || city === 'undefined' || !cityListSlugs.includes(city)) {
+      if (!city || !cityListSlugs.includes(city)) {
         if (cities.length > 0) {
-          city = cities[0].slug; // Safely transition to the first city in the new country
+          city = cities[0].slug; 
+          req.session.selectedCity = city; // Store corrected selection sync
         } else {
           return res.send('<p class="text-xs text-red-500 p-4">No city dataset resolved for this profile scope.</p>');
         }
       }
     }
 
-    const cleanCountry = country.toLowerCase().trim();
-    const cleanCity = city ? city.toLowerCase().trim() : '';
+    const cleanCountry = country;
+    const cleanCity = level === 'city' ? city : '';
 
     const dataPath = level === 'country' 
       ? path.join(countriesDir, cleanCountry, 'index.js')
@@ -136,6 +166,5 @@ router.get('/calculate', (req, res) => {
     res.status(500).send('<p class="text-xs text-red-500 p-4">Internal calculator calculation error.</p>');
   }
 });
-
 
 module.exports = router;

@@ -5,7 +5,10 @@ const fs = require('fs');
 
 const router = express.Router();
 const ROOT_DIR = path.resolve(__dirname, '../../');
-const { loadCountry, loadCountries } = require(path.join(ROOT_DIR, 'loaders/country'));
+
+// FIXED: Added loadCitiesForCountry to the destructuring block
+const { loadCountry, loadCountries, loadCitiesForCountry } = require(path.join(ROOT_DIR, 'loaders/country'));
+
 const {
   filterAndSortCountries,
   renderFilterBar,
@@ -38,16 +41,28 @@ router.get('/compare-all', (req, res) => {
 
 // 2. Single Country View Endpoint
 router.get('/country', (req, res) => {
-  const countryParam = req.query.country || 'argentina';
+  // Capture explicit country change parameter first
+  const countryParam = req.query.country || req.session?.selectedCountry || 'argentina';
+  
+  // Write directly into global session so all other tabs immediately read this selected country
+  req.session.selectedCountry = countryParam.toLowerCase().trim();
+
+  // Load valid city indices for this country to prevent out-of-bounds city states when navigating tabs
+  const availableCities = loadCitiesForCountry(req.session.selectedCountry);
+  if (availableCities && availableCities.length > 0) {
+    req.session.selectedCity = availableCities[0].slug; // Lock the first available city
+  } else {
+    req.session.selectedCity = null;
+  }
+
   const selectedMonth = req.query.month || 'none';
-  const country = loadCountry(countryParam);
+  const country = loadCountry(req.session.selectedCountry);
   const templatePath = path.join(ROOT_DIR, 'components/logistics/country-view.html');
 
   if (!country || !fs.existsSync(templatePath)) return res.status(404).send('Template missing');
 
   const allCountries = loadCountries();
   const readiness = country.travelReadiness || {};
-
   const seasonalityStripHtml = renderSeasonalityStrip(readiness.seasonality, selectedMonth);
 
   const dropdownOptions = allCountries.map(c => 
@@ -65,5 +80,6 @@ router.get('/country', (req, res) => {
 
   res.send(html);
 });
+
 
 module.exports = router;
