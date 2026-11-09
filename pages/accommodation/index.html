@@ -7,9 +7,9 @@
       <p class="text-xs text-slate-500 mt-1">Explore verified stay options and local food breakdowns</p>
     </div>
 
-    <!-- Declarative Global Location Group -->
-    <form class="flex items-center gap-3" id="accommodation-location-form">
-      <!-- Country Dropdown: Populates city choices AND tells the content area to refresh itself -->
+    <!-- Declarative Unified Location Control Group -->
+    <form class="flex items-center gap-3" id="accommodation-location-form" onsubmit="return false;">
+      <!-- Country Dropdown: Populates city choices AND forces content updates safely -->
       <select id="acc-country-select" 
               name="country" 
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
@@ -28,12 +28,12 @@
         <option value="argentina">Loading Registry...</option>
       </select>
 
-      <!-- City Selector: Explicitly watches for manual shifts or parent updates -->
+      <!-- City Selector: Explicitly handles parent reloads with full index dependencies -->
       <select id="acc-city-select" 
               name="city"
               class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
               hx-get="/partials/accommodation/city-dropdown-options"
-              hx-trigger="load from:#acc-country-select, dependencies-updated"
+              hx-trigger="load from:#acc-country-select"
               hx-target="this" 
               hx-include="[id='acc-country-select']"
               hx-swap="innerHTML"
@@ -43,47 +43,40 @@
     </form>
   </div>
 
-  <!-- Mode Toggle Component Framework -->
+  <!-- Mode Toggle Component Framework (Mirrors Resonance Level Toggle Styles) -->
   <div class="flex gap-2 mb-6" id="mode-toggle-form">
     <input type="hidden" id="acc-mode-input" name="mode" value="stay">
     
     <button type="button" 
             id="btn-mode-stay" 
             class="px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white" 
-            hx-get="/partials/accommodation/render"
-            hx-target="#accommodation-content"
-            hx-include="[id='acc-country-select'], [id='acc-city-select']"
-            hx-vals='{"mode": "stay"}'
-            hx-trigger="click, load-data from:#accommodation-content"
-            hx-on::after-request="
+            hx-on:click="
               document.getElementById('acc-mode-input').value = 'stay';
               this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
               document.getElementById('btn-mode-food').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
+              htmx.trigger('#accommodation-content', 'load-data');
             ">
       Where to Stay
     </button>
+    
     <button type="button" 
             id="btn-mode-food" 
             class="px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600"
-            hx-get="/partials/accommodation/render"
-            hx-target="#accommodation-content"
-            hx-include="[id='acc-country-select'], [id='acc-city-select']"
-            hx-vals='{"mode": "food"}'
-            hx-trigger="click"
-            hx-on::after-request="
+            hx-on:click="
               document.getElementById('acc-mode-input').value = 'food';
               this.className = 'px-3 py-1 rounded-lg text-sm font-bold bg-indigo-600 text-white';
               document.getElementById('btn-mode-stay').className = 'px-3 py-1 rounded-lg text-sm font-bold bg-slate-100 text-slate-600';
+              htmx.trigger('#accommodation-content', 'load-data');
             ">
       Food Strategy
     </button>
   </div>
 
-  <!-- Main Mount Target Node for Dynamic Content Injection -->
+  <!-- Central Processing Mount Target Area -->
   <div id="accommodation-content" 
        hx-get="/partials/accommodation/render"
-       hx-trigger="load-data, dependencies-updated from:#acc-city-select"
-       hx-include="[id='acc-country-select'], [id='acc-city-select'], [id='acc-mode-input']"
+       hx-trigger="load, load-data"
+       hx-include="#accommodation-location-form, [id='acc-mode-input']"
        hx-swap="innerHTML">
     <p class="text-xs text-slate-400 italic">Select location parameters to mount template logs...</p>
   </div>
