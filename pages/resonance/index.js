@@ -3,117 +3,139 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const { renderResonanceDashboard, renderGlobalMatches } = require('./renderers');
+const { loadCitiesForCountry } = require('../../loaders/country');
 
-// Use your centralized manifest data file as the absolute single source of truth
-const manifestPath = path.join(__dirname, '../../data/manifest.json');
 const countriesDir = path.join(__dirname, '../../data/countries');
 
-// Route 1: Pull only verified countries explicitly recorded in the manifest file
+// Route 1: Country Dropdown Options
 router.get('/country-dropdown-options', (req, res) => {
   try {
+    const manifestPath = path.join(__dirname, '../../data/manifest.json');
     if (!fs.existsSync(manifestPath)) {
+      console.error("[DEBUG] Manifest missing at:", manifestPath);
       return res.status(500).send('<option value="">Manifest missing</option>');
     }
-
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    let optionsHtml = '';
+    let html = '';
     let isFirst = true;
 
-    (manifest.countries || []).forEach(country => {
-      // Cross-verify that a matching javascript file directory actually exists
-      const indexPath = path.join(countriesDir, country.slug, 'index.js');
-      
-      if (fs.existsSync(indexPath)) {
-        optionsHtml += `<option value="${country.slug}" ${isFirst ? 'selected' : ''}>${country.icon || '📍'} ${country.name}</option>`;
+    (manifest.countries || []).forEach(c => {
+      if (fs.existsSync(path.join(countriesDir, c.slug, 'index.js'))) {
+        html += `<option value="${c.slug}" ${isFirst ? 'selected' : ''}>${c.icon || '📍'} ${c.name}</option>`;
         isFirst = false;
       }
     });
-
-    res.send(optionsHtml || '<option value="">No configured countries</option>');
+    res.send(html || '<option value="">No configured countries</option>');
   } catch (err) {
-    console.error("Failed parsing country list matrix:", err);
+    console.error("[DEBUG] Error reading country options:", err);
     res.status(500).send('<option value="">Error processing schema</option>');
   }
 });
 
-// Route 2: Render contextual cities mapped to the selected country's manifest entries
+// Route 2: Render contextual cities
 router.get('/city-dropdown-options', (req, res) => {
   try {
     const { country } = req.query;
+    console.log(`\n[DEBUG] Fetching cities for country: "${country}"`);
+    
     if (!country) return res.send('<option value="">Select country</option>');
 
-    if (!fs.existsSync(manifestPath)) return res.send('');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const cities = loadCitiesForCountry(country);
+    console.log(`[DEBUG] Cities array found via loader:`, cities);
 
-    // Find the country object by matching slugs
-    const targetCountry = (manifest.countries || []).find(c => c.slug === country.toLowerCase());
-    if (!targetCountry) return res.send('<option value="">Country unlinked</option>');
+    if (!cities || cities.length === 0) {
+      console.warn(`[DEBUG] No cities arrays resolved for country shortcut node: ${country}`);
+      return res.send('<option value="">No cities configured</option>');
+    }
 
-    // Filter cities matching target parent ID attributes
-    const matchedCities = (manifest.cities || []).filter(city => city.countryId === targetCountry.id);
-    let optionsHtml = '';
-    let isFirst = true;
+    const html = cities.map((city, index) => {
+      const isSelected = index === 0 ? 'selected' : '';
+      console.log(`[DEBUG] Mapping option -> name: ${city.name}, slug: ${city.slug}, active: ${index === 0}`);
+      return `<option value="${city.slug}" ${isSelected}>${city.name}</option>`;
+    }).join('\n');
 
-    matchedCities.forEach(city => {
-      // Format display string syntax (buenos-aires -> Buenos Aires)
-      const name = city.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-      optionsHtml += `<option value="${city.slug}" ${isFirst ? 'selected' : ''}>${name}</option>`;
-      isFirst = false;
-    });
-
-    res.send(optionsHtml || '<option value="">No cities configured</option>');
+    // ⚡ Tell HTMX to automatically recalculate the dashboard with the newly selected first city
+    res.setHeader('HX-Trigger', 'dependencies-updated');
+    res.send(html);
   } catch (err) {
-    console.error("Failed parsing matching city arrays:", err);
+    console.error("[DEBUG] Error loading city options:", err);
     res.send('<option value="">Error loading cities</option>');
   }
 });
 
-module.exports = router;
-
-// Calculate probability matrices and output signals grid layout
+// Route 3: Core Calculator & Calculation Pipeline
+// ⚡ inside pages/resonance/index.js -> router.get('/calculate', ...)
 router.get('/calculate', (req, res) => {
-  const { level = 'country', country, city } = req.query;
-  if (!country) return res.send('<p class="text-xs text-slate-400">Select parameter scope.</p>');
+  try {
+    let { level = 'country', country, city, selectedSignalKey, selectedSignalLabel } = req.query;
 
-  let dataPath = '';
-  if (level === 'country') {
-    dataPath = path.join(countriesDir, country.toLowerCase(), 'index.js');
-  } else {
-    if (!city) return res.send('');
-    dataPath = path.join(countriesDir, country.toLowerCase(), `${city.toLowerCase()}.js`);
+    // Fix the 500 Error: Flatten array parameters caused by HTMX duplication drops
+    if (Array.isArray(level)) level = level[0];
+    if (Array.isArray(country)) country = country[0];
+    if (Array.isArray(city)) city = city[0];
+    if (Array.isArray(selectedSignalKey)) selectedSignalKey = selectedSignalKey[0];
+    if (Array.isArray(selectedSignalLabel)) selectedSignalLabel = selectedSignalLabel[0];
+
+    if (!country) return res.send('<p class="text-xs text-slate-400 p-4">Select parameter scope.</p>');
+
+    // ⚡ FIX THE 404 TRAP: Validate city context belongs to the active country folder map
+    if (level === 'city') {
+      const cities = loadCitiesForCountry(country);
+      const cityListSlugs = cities.map(c => c.slug);
+      
+      // If city is completely blank OR belongs to a different country (e.g., country=spain, city=cdmx)
+      if (!city || city.trim() === '' || city === 'undefined' || !cityListSlugs.includes(city)) {
+        if (cities.length > 0) {
+          city = cities[0].slug; // Safely transition to the first city in the new country
+        } else {
+          return res.send('<p class="text-xs text-red-500 p-4">No city dataset resolved for this profile scope.</p>');
+        }
+      }
+    }
+
+    const cleanCountry = country.toLowerCase().trim();
+    const cleanCity = city ? city.toLowerCase().trim() : '';
+
+    const dataPath = level === 'country' 
+      ? path.join(countriesDir, cleanCountry, 'index.js')
+      : path.join(countriesDir, cleanCountry, `${cleanCity}.js`);
+
+    if (!fs.existsSync(dataPath)) {
+      return res.status(404).send('<p class="text-xs text-red-500 p-4">Data source unresolvable.</p>');
+    }
+
+    delete require.cache[require.resolve(dataPath)];
+    const targetData = require(dataPath);
+    const signals = targetData.resonanceSignals || targetData.metrics || {};
+
+    let globalMatchesHTML = '';
+    if (selectedSignalKey && selectedSignalLabel) {
+      let matches = [];
+      try {
+        fs.readdirSync(countriesDir).forEach(slug => {
+          const p = path.join(countriesDir, slug, 'index.js');
+          if (fs.existsSync(p)) {
+            const cData = require(p);
+            const score = cData.resonanceSignals?.[selectedSignalKey] || cData.metrics?.[selectedSignalKey] || 0;
+            if (score >= 7) {
+              matches.push(cData.name || slug.charAt(0).toUpperCase() + slug.slice(1));
+            }
+          }
+        });
+      } catch (err) { 
+        console.error("Failed calculating global overlaps list:", err); 
+      }
+      globalMatchesHTML = renderGlobalMatches(selectedSignalLabel, matches);
+    }
+
+    const sanitizedQuery = { level, country: cleanCountry, city: cleanCity };
+    res.send(renderResonanceDashboard(signals, sanitizedQuery, selectedSignalKey, selectedSignalLabel, globalMatchesHTML));
+  } catch (err) {
+    console.error("Calculation loop failure:", err);
+    res.status(500).send('<p class="text-xs text-red-500 p-4">Internal calculator calculation error.</p>');
   }
-
-  if (!fs.existsSync(dataPath)) {
-    return res.status(404).send('<p class="text-xs text-red-500">Resonance data source unresolvable.</p>');
-  }
-
-  delete require.cache[require.resolve(dataPath)];
-  const targetData = require(dataPath);
-  const signals = targetData.resonanceSignals || targetData.metrics || {};
-
-  let html = `<div id="resonance-section" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">`;
-
-  Object.keys(signals).forEach(key => {
-    const score = signals[key];
-    // Formats snakeCase parameters into readable labels (e.g., lateNightDining -> Late Night Dining)
-    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-    
-    html += `
-      <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition cursor-pointer"
-           onclick="showGlobalMatches('${key}', '${label}')">
-        <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-slate-700 tracking-wider">${label}</span>
-          <span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-black rounded text-xs">${score}/10</span>
-        </div>
-        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-          <div class="bg-blue-600 h-full transition-all duration-300" style="width: ${score * 10}%"></div>
-        </div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  res.send(html);
 });
+
 
 module.exports = router;

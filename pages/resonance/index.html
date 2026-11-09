@@ -1,3 +1,4 @@
+<!-- pages/resonance/index.html -->
 <main class="max-w-[1440px] mx-auto px-4 py-6">
   
   <div class="mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
@@ -13,75 +14,90 @@
       <p class="text-xs text-slate-500 mt-1">Discover the unique characteristics and energy patterns of destinations</p>
     </div>
 
-    <!-- Declarative Global Parameters Form -->
-   <!-- Excerpt from pages/resonance/index.html -->
+    <!-- Declarative Independent Location Control Group (Matches Accommodation layout style perfectly) -->
+    <form class="flex items-center gap-4" id="resonance-location-form" onsubmit="return false;">
+      
+      <!-- 🔘 Level Toggle Tab Group -->
+      <div class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
+        <input type="hidden" id="res-level-input" name="level" value="country">
+        
+        <button type="button" 
+                id="btn-lvl-country" 
+                class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-blue-600 shadow-sm"
+                hx-on:click="
+                  document.getElementById('res-level-input').value = 'country';
+                  this.className = 'px-3 py-1.5 text-xs font-bold rounded-md bg-white text-blue-600 shadow-sm';
+                  document.getElementById('btn-lvl-city').className = 'px-3 py-1.5 text-xs font-bold text-slate-600';
+                  document.getElementById('active-mode-badge').textContent = 'Country Mode';
+                  document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200';
+                  document.getElementById('res-city-select-wrapper').classList.add('opacity-40', 'pointer-events-none');
+                  htmx.trigger('#resonance-content', 'load-data');
+                ">
+          Country Mode
+        </button>
 
-<!-- Integrated Parameters Control Form -->
-<form id="resonance-control-form" 
-      class="flex items-center gap-3"
-      hx-get="/partials/resonance/calculate" 
-      hx-target="#resonance-content" 
-      hx-trigger="change, load, dependencies-updated">
-  
-  <!-- Granularity Selector Controls -->
-  <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1">
-    <input type="radio" id="lvl-country" name="level" value="country" checked class="hidden peer/country">
-    <label for="lvl-country" 
-           class="px-3 py-1 rounded-md text-xs font-bold cursor-pointer bg-white text-slate-800 shadow-sm peer-checked/country:bg-white"
-           hx-on:click="
-             document.getElementById('resonance-city-select').classList.add('hidden');
-             document.getElementById('active-mode-badge').textContent = 'Country Mode';
-             document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-100 text-blue-800 border border-blue-200';
-           ">
-      Country
-    </label>
+        <button type="button" 
+                id="btn-lvl-city" 
+                class="px-3 py-1.5 text-xs font-bold text-slate-600"
+                hx-on:click="
+                  document.getElementById('res-level-input').value = 'city';
+                  this.className = 'px-3 py-1.5 text-xs font-bold rounded-md bg-white text-blue-600 shadow-sm';
+                  document.getElementById('btn-lvl-country').className = 'px-3 py-1.5 text-xs font-bold text-slate-600';
+                  document.getElementById('active-mode-badge').textContent = 'City Mode';
+                  document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200';
+                  document.getElementById('res-city-select-wrapper').classList.remove('opacity-40', 'pointer-events-none');
+                  htmx.trigger('#resonance-content', 'load-data');
+                ">
+          City Mode
+        </button>
+      </div>
 
-    <input type="radio" id="lvl-city" name="level" value="city" class="hidden peer/city">
-    <label for="lvl-city" 
-           class="px-3 py-1 rounded-md text-xs font-bold cursor-pointer text-slate-600 peer-checked/city:bg-white"
-           hx-on:click="
-             document.getElementById('resonance-city-select').classList.remove('hidden');
-             document.getElementById('active-mode-badge').textContent = 'City Mode';
-             document.getElementById('active-mode-badge').className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200';
-           ">
-      City
-    </label>
+      <!-- 🌍 Country Selector -->
+      <div class="flex flex-col">
+        <label for="res-country-select" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Select Country</label>
+        <select id="res-country-select" 
+                name="country" 
+                class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800 cursor-pointer shadow-sm"
+                hx-get="/partials/resonance/country-dropdown-options"
+                hx-trigger="load"
+                hx-target="this"
+                hx-swap="innerHTML"
+                hx-on:change="
+                  htmx.ajax('GET', '/partials/resonance/city-dropdown-options', {
+                    target: '#res-city-select', 
+                    values: { country: this.value }
+                  }).then(() => {
+                    htmx.trigger('#resonance-content', 'load-data');
+                  });
+                ">
+          <option value="argentina">Loading Registry...</option>
+        </select>
+      </div>
+
+      <!-- 🏙️ City Selector -->
+      <div id="res-city-select-wrapper" class="flex flex-col opacity-40 pointer-events-none transition-all duration-150">
+        <label for="res-city-select" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Select City</label>
+        <select id="res-city-select" 
+                name="city" 
+                class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800 cursor-pointer shadow-sm"
+                hx-get="/partials/resonance/city-dropdown-options"
+                hx-trigger="load from:#res-country-select"
+                hx-target="this" 
+                hx-include="[id='res-country-select']"
+                hx-swap="innerHTML"
+                hx-on:change="htmx.trigger('#resonance-content', 'load-data')">
+            <option value="">Select a city</option>
+        </select>
+      </div>
+
+    </form>
   </div>
 
-<!-- Excerpt from pages/resonance/index.html -->
-
-<!-- Dynamic Country Selector Dropdown -->
-<select id="resonance-country-select" 
-        name="country"
-        class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer"
-        hx-get="/partials/resonance/country-dropdown-options"
-        hx-target="this"
-        hx-trigger="load"
-        hx-swap="innerHTML"
-        hx-on::after-request="htmx.trigger('#resonance-city-select', 'dependencies-updated');">
-  <!-- Dynamic script options overwrite this container immediately on load -->
-</select>
-
-<!-- Contextual City Selector Dropdown -->
-<select id="resonance-city-select" 
-        name="city"
-        class="px-3 py-1.5 bg-slate-100 rounded-xl text-xs font-bold text-slate-800 border-none outline-none cursor-pointer hidden"
-        hx-get="/partials/resonance/city-dropdown-options"
-        hx-target="this"
-        hx-include="[id='resonance-country-select']"
-        hx-trigger="change from:#resonance-country-select, dependencies-updated">
-  <option value="">Select a city</option>
-</select>
-
-</form>
-
+  <!-- Central Processing Mount Target (Cleaned of infinite trigger loops) -->
+  <div id="resonance-content" 
+       hx-get="/partials/resonance/calculate"
+       hx-trigger="load, load-data"
+       hx-include="[id='res-level-input'], [id='res-country-select'], [id='res-city-select']"
+       hx-swap="innerHTML">
   </div>
-
-  <!-- Dynamic Content Node Block Wrapper -->
-  <div id="resonance-content">
-       <!-- Compiled matching probabilities render cleanly here -->
-  </div>
-
-  <!-- Global Multi-Destination Matches Output View -->
-  <div id="global-matches-container" class="mt-8"></div>
 </main>
