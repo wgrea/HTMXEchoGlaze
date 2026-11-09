@@ -21,12 +21,14 @@
         <!-- I want the navigation to be responsive whether in desktop mode and mobile mode -->
 <nav class="hidden md:flex items-center gap-1">
 
-  <a href="#"
-     hx-get="pages/logistics.html"
-     hx-target="#app-main-content"
-     hx-swap="innerHTML">
-    ✈️ Logistics
-  </a>
+<!-- components/nav.html -->
+<a href="#"
+   hx-get="/pages/logistics"
+   hx-target="#app-main-content"
+   hx-swap="innerHTML">
+  ✈️ Logistics
+</a>
+
 
   <a href="#"
      hx-get="pages/accommodation/index.html"
