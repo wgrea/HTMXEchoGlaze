@@ -39,12 +39,15 @@
             class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest bg-white text-indigo-600 shadow-md transition-all">
             COMPARE COUNTRIES
           </button>
-          <button 
-            hx-get="/api/logistics/country?country=argentina" 
-            hx-target="#logistics-content"
-            class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest text-slate-500 hover:text-slate-700 transition-all">
-            COUNTRY VIEW
-          </button>
+<!-- pages/logistics/index.html -->
+<!-- FIXED: Removed ?country=argentina so the tab naturally reads from your live session memory -->
+<button 
+  hx-get="/api/logistics/country" 
+  hx-target="#logistics-content"
+  class="flex-1 min-w-[140px] px-5 py-3 rounded-xl text-xs font-black tracking-widest text-slate-500 hover:text-slate-700 transition-all">
+  COUNTRY VIEW
+</button>
+
         </div>
 
 

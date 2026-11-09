@@ -8,11 +8,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // =========================================================
-// 1. STATIC ASSETS & MIDDLEWARE
+// 1. SESSION MEMORY ENGINE (Add this right above static assets)
 // =========================================================
+const session = require('express-session');
+app.use(session({
+  secret: 'echoglaze-secret-token',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 Hour state retention windows
+}));
+
 app.use('/css', express.static(path.join(__dirname, 'css')));
-// Serve root folder static assets safely (handles static .html, client scripts, icons)
 app.use(express.static(__dirname));
+
 
 // =========================================================
 // 2. DYNAMIC ROUTERS & PARTIAL ENDPOINTS
@@ -27,10 +35,15 @@ app.use('/api/logistics', logisticsRouter);
 
 // Global endpoint to serve uniform options lists to any selector page
 app.get('/partials/global/country-options', (req, res) => {
-  const selectedCountry = req.query.country || 'argentina';
+  // Pull from session state first, then fallback to query parameter, then hard default to argentina
+  const selectedCountry = req.session.selectedCountry || req.query.country || 'argentina';
   res.send(getCountryDropdownOptions(selectedCountry));
 });
 
+
+// =========================================================
+// 3. EXPLICIT PAGE & COMPONENT HANDLERS
+// =========================================================
 // =========================================================
 // 3. EXPLICIT PAGE & COMPONENT HANDLERS
 // =========================================================
@@ -46,7 +59,10 @@ app.get('/transportation', (req, res) => {
       return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Core System Files</p>');
     }
 
-    const generatedOptions = getCountryDropdownOptions('argentina');
+    // Read uniform state engine
+    const activeCountry = req.session?.selectedCountry || 'argentina';
+    const generatedOptions = getCountryDropdownOptions(activeCountry);
+    
     let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
     return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
   } catch (err) {
@@ -54,19 +70,22 @@ app.get('/transportation', (req, res) => {
   }
 });
 
+
 // --- Accommodation Shell Handler ---
 app.get('/accommodation', (req, res) => {
   try {
     const fragmentPath = path.join(__dirname, 'pages/accommodation', 'index.html');
     if (!fs.existsSync(fragmentPath)) {
-      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Accommodation Shell File</p>');
+      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Core System Files</p>');
     }
-
-    const generatedOptions = getCountryDropdownOptions('argentina');
+    
+    const activeCountry = req.session?.selectedCountry || 'argentina';
+    const generatedOptions = getCountryDropdownOptions(activeCountry);
+    
     let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
     return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
   } catch (err) {
-    res.status(500).send('<p class="text-xs text-red-400 font-mono">Failed to compile Accommodation wrapper</p>');
+    res.status(500).send('<p class="text-xs text-red-400 font-mono">Failed to compile wrapper</p>');
   }
 });
 
@@ -75,10 +94,12 @@ app.get('/packing', (req, res) => {
   try {
     const fragmentPath = path.join(__dirname, 'pages/packing', 'index.html');
     if (!fs.existsSync(fragmentPath)) {
-      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Packing Shell File</p>');
+      return res.status(404).send('<p class="text-xs text-amber-500 font-mono">Missing Core System Files</p>');
     }
-
-    const generatedOptions = getCountryDropdownOptions('argentina');
+    
+    const activeCountry = req.session?.selectedCountry || 'argentina';
+    const generatedOptions = getCountryDropdownOptions(activeCountry);
+    
     let baseShell = fs.readFileSync(fragmentPath, 'utf-8');
     return res.send(baseShell.replace('{{COUNTRY_OPTIONS}}', generatedOptions));
   } catch (err) {

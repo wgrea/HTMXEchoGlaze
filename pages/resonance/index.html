@@ -77,17 +77,20 @@
       <!-- 🏙️ City Selector -->
       <div id="res-city-select-wrapper" class="flex flex-col opacity-40 pointer-events-none transition-all duration-150">
         <label for="res-city-select" class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Select City</label>
-        <select id="res-city-select" 
-                name="city" 
-                class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800 cursor-pointer shadow-sm"
-                hx-get="/partials/resonance/city-dropdown-options"
-                hx-trigger="load from:#res-country-select"
-                hx-target="this" 
-                hx-include="[id='res-country-select']"
-                hx-swap="innerHTML"
-                hx-on:change="htmx.trigger('#resonance-content', 'load-data')">
-            <option value="">Select a city</option>
-        </select>
+<!-- City Selector inside pages/resonance/index.html -->
+<select id="res-city-select" 
+        name="city" 
+        class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800 cursor-pointer shadow-sm"
+        hx-get="/partials/resonance/city-dropdown-options"
+        hx-trigger="load from:#res-country-select delay:50ms"
+        hx-target="this" 
+        hx-include="[id='res-country-select']"
+        hx-swap="innerHTML"
+        hx-on::after-on-load="htmx.trigger('#resonance-content', 'load-data')"
+        hx-on:change="htmx.trigger('#resonance-content', 'load-data')">
+    <option value="">Select a city</option>
+</select>
+
       </div>
 
     </form>

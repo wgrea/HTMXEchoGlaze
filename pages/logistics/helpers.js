@@ -29,6 +29,7 @@ function applyFilters(r, selectedMonth, visaType) {
   return true;
 }
 
+/* pages/logistics/helpers.js */
 function filterAndSortCountries(countries, selectedMonth, visaType, sortMode) {
   let list = countries.filter(c => applyFilters(c.travelReadiness, selectedMonth, visaType));
 
@@ -51,20 +52,21 @@ function filterAndSortCountries(countries, selectedMonth, visaType, sortMode) {
     const aStay = aVisa.touristStayDays ?? 0;
     const bStay = bVisa.touristStayDays ?? 0;
 
+    // 💡 FIXED: Dynamically isolates active visa sub-types and evaluates descending lengths by default
     if (visaType === 'nomad') {
-      if (sortMode === 'nomadAsc') return aNomad - bNomad;
-      if (sortMode === 'nomadDesc') return bNomad - aNomad;
+      return bNomad - aNomad;
     }
     if (visaType === 'tourist') {
-      if (sortMode === 'touristAsc') return aTourist - bTourist;
-      if (sortMode === 'touristDesc') return bTourist - aTourist;
+      return bTourist - aTourist;
     }
     if (visaType === 'visaFree') {
-      if (sortMode === 'stayAsc') return aStay - bStay;
-      if (sortMode === 'stayDesc') return bStay - aStay;
+      return bStay - aStay;
     }
 
-    return 0;
+    // Default macro blending index fallback when 'all' is selected (Nomad Months + Tourist Months)
+    const totalA = aNomad + aTourist;
+    const totalB = bNomad + bTourist;
+    return totalB - totalA;
   });
 
   return list;

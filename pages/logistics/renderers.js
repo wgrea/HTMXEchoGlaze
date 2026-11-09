@@ -12,27 +12,6 @@ function renderFilterBar(selectedMonth, visaType, sortMode) {
     { val: 'nov', label: 'November' }, { val: 'dec', label: 'December' }
   ].map(m => `<option value="${m.val}" ${m.val === selectedMonth ? 'selected' : ''}>${m.label}</option>`).join('');
 
-  let sortSelectHtml = '';
-  if (selectedMonth === 'none' && visaType !== 'all') {
-    let options = `<option disabled ${sortMode === 'none' ? 'selected' : ''}>Sort</option>`;
-    if (visaType === 'nomad') {
-      options += `<option value="nomadAsc" ${sortMode === 'nomadAsc' ? 'selected' : ''}>Short → Long</option>`;
-      options += `<option value="nomadDesc" ${sortMode === 'nomadDesc' ? 'selected' : ''}>Long → Short</option>`;
-    } else if (visaType === 'tourist') {
-      options += `<option value="touristAsc" ${sortMode === 'touristAsc' ? 'selected' : ''}>Short → Long</option>`;
-      options += `<option value="touristDesc" ${sortMode === 'touristDesc' ? 'selected' : ''}>Long → Short</option>`;
-    } else if (visaType === 'visaFree') {
-      options += `<option value="stayAsc" ${sortMode === 'stayAsc' ? 'selected' : ''}>Short → Long</option>`;
-      options += `<option value="stayDesc" ${sortMode === 'stayDesc' ? 'selected' : ''}>Long → Short</option>`;
-    }
-
-    sortSelectHtml = `
-      <select name="sortMode" hx-get="/api/logistics/compare-all" hx-target="#logistics-content" hx-include="#filter-bar" class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50">
-        ${options}
-      </select>
-    `;
-  }
-
   const visas = [
     { val: 'all', label: 'Visa Type: All' },
     { val: 'nomad', label: 'Digital Nomad Visa' },
@@ -40,19 +19,20 @@ function renderFilterBar(selectedMonth, visaType, sortMode) {
     { val: 'visaFree', label: 'Visa‑Free Stay' }
   ].map(v => `<option value="${v.val}" ${v.val === visaType ? 'selected' : ''}>${v.label}</option>`).join('');
 
+  // 💡 FIXED: Completely removed the sortSelectHtml condition to clean up the layout grid
   return `
-    <form id="filter-bar" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+    <form id="filter-bar" class="grid grid-cols-2 gap-2 mb-6">
       <select name="month" hx-get="/api/logistics/compare-all" hx-target="#logistics-content" hx-include="#filter-bar" class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50">
         ${months}
       </select>
       ${selectedMonth === 'none' ? `
-        ${sortSelectHtml}
         <select name="visaType" hx-get="/api/logistics/compare-all" hx-target="#logistics-content" hx-include="#filter-bar" class="text-[10px] font-bold uppercase p-2 rounded border bg-slate-50">
           ${visas}
         </select>
       ` : ''}
     </form>`;
 }
+
 
 function renderComparisonCards(countries, selectedMonth, visaType) {
   if (!countries.length) return `<p class="col-span-full text-xs text-slate-500 italic p-4 text-center">No countries match these filters.</p>`;

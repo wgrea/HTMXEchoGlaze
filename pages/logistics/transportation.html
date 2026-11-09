@@ -16,6 +16,12 @@
 
 <body>
 
+ <!-- Injects the global master header -->
+  <div hx-get="/components/nav.html" hx-trigger="load" hx-swap="outerHTML"></div>
+
+  <!-- 💡 ADDED TARGET: Gives the navigation buttons a container to swap into -->
+  <main id="app-main-content" class="w-full">
+
 <div id="transportation-page-container" class="space-y-6 animate-fadeIn">
 
   <header class="flex items-center justify-between bg-surface p-4 rounded-xl border border-border shadow-sm mb-6">

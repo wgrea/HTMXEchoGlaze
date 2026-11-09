@@ -6,7 +6,6 @@ const fs = require('fs');
 const router = express.Router();
 const ROOT_DIR = path.resolve(__dirname, '../../');
 
-// FIXED: Added loadCitiesForCountry to the destructuring block
 const { loadCountry, loadCountries, loadCitiesForCountry } = require(path.join(ROOT_DIR, 'loaders/country'));
 
 const {
@@ -31,6 +30,9 @@ router.get('/compare-all', (req, res) => {
   const filterBarHtml = renderFilterBar(selectedMonth, visaType, sortMode);
   const comparisonGridHtml = renderComparisonCards(filtered, selectedMonth, visaType);
 
+  // Debug trace statement
+  console.log(`[STATE LOGIC] Compare All loaded. Preserved session context country: ${req.session?.selectedCountry || 'none'}`);
+
   let html = fs.readFileSync(templatePath, 'utf8');
   html = html
     .replace('{{FILTER_BAR}}', filterBarHtml)
@@ -41,19 +43,52 @@ router.get('/compare-all', (req, res) => {
 
 // 2. Single Country View Endpoint
 router.get('/country', (req, res) => {
-  // Capture explicit country change parameter first
-  const countryParam = req.query.country || req.session?.selectedCountry || 'argentina';
-  
-  // Write directly into global session so all other tabs immediately read this selected country
-  req.session.selectedCountry = countryParam.toLowerCase().trim();
+  // 1. Check if the user explicitly clicked a country card override (e.g. clicking Brazil in the grid)
+  let countryParam = req.query.country;
 
-  // Load valid city indices for this country to prevent out-of-bounds city states when navigating tabs
+  // 2. If no query parameter exists (like clicking the top navigation tab bar),
+  // pull the globally active session variable. If the session is completely new, default to argentina.
+  if (!countryParam || countryParam === 'undefined' || countryParam.trim() === '') {
+    countryParam = req.session?.selectedCountry || 'argentina';
+  } else {
+    countryParam = countryParam.toLowerCase().trim().replace(/\s+/g, '-');
+  }
+
+  // Lock backend record to the verified selection choice
+  req.session.selectedCountry = countryParam;
+
+  // 1. EXTRACT INCOMING QUERY VALUE
+  let incomingQueryCountry = req.query.country;
+
+  // 2. RIGID LOGIC CHECK: Only change the location state if the user explicitly 
+  // selected a non-empty, valid country string parameter from a select dropdown or a button click.
+  if (incomingQueryCountry && incomingQueryCountry.trim() !== '' && incomingQueryCountry !== 'undefined' && incomingQueryCountry !== 'Loading Registry...') {
+    req.session.selectedCountry = incomingQueryCountry.toLowerCase().trim().replace(/\s+/g, '-');
+  }
+
+  // 3. SECURE RECOVERY LAYER: If no country is active in the session yet (like a fresh browser boot),
+  // set the global fallback anchor to argentina.
+  if (!req.session.selectedCountry) {
+    req.session.selectedCountry = 'argentina';
+  }
+
+  // Auto-sync valid nested city indices to keep layout fragments like Accommodation from freezing
   const availableCities = loadCitiesForCountry(req.session.selectedCountry);
   if (availableCities && availableCities.length > 0) {
-    req.session.selectedCity = availableCities[0].slug; // Lock the first available city
+    const cityListSlugs = availableCities.map(c => c.slug.toLowerCase().trim());
+    if (!req.session.selectedCity || !cityListSlugs.includes(req.session.selectedCity.toLowerCase().trim())) {
+      req.session.selectedCity = availableCities[0].slug; 
+    }
   } else {
     req.session.selectedCity = null;
   }
+
+  // Explicit Terminal State Logger Messages
+  console.log(`\n======================================================`);
+  console.log(`[STATE LOG] 🌍 UNIFIED LOGISTICS SYSTEM ROUTER`);
+  console.log(`📍 ACTIVE PERSISTENT COUNTRY SELECTION : "${req.session.selectedCountry.toUpperCase()}"`);
+  console.log(`🏙️ ACTIVE LOCKED CITY NEST STATE     : "${(req.session.selectedCity || 'NONE').toUpperCase()}"`);
+  console.log(`======================================================\n`);
 
   const selectedMonth = req.query.month || 'none';
   const country = loadCountry(req.session.selectedCountry);
@@ -65,6 +100,7 @@ router.get('/country', (req, res) => {
   const readiness = country.travelReadiness || {};
   const seasonalityStripHtml = renderSeasonalityStrip(readiness.seasonality, selectedMonth);
 
+  // Echo selection states inside country-view select box tags dynamically
   const dropdownOptions = allCountries.map(c => 
     `<option value="${c.slug}" ${c.slug === country.slug ? 'selected' : ''}>${c.name}</option>`
   ).join('');
