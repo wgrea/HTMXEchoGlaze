@@ -10,8 +10,13 @@ router.get('/render', (req, res) => {
   const { country } = req.query;
   if (!country) return res.send('');
 
+  // =========================================================
+  // STATE PERSISTENCE COUPLING
+  // =========================================================
+  req.session.selectedCountry = country.toLowerCase().trim();
+
   const targetPath = path.join(countriesDir, country.toLowerCase(), 'index.js');
-  
+
   if (!fs.existsSync(targetPath)) {
     return res.status(404).send('<p class="text-xs text-red-500 p-4">Packing profile dataset missing.</p>');
   }

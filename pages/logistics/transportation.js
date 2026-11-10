@@ -7,9 +7,14 @@ const fs = require('fs');
 router.get('/render', (req, res) => {
   const countryId = (req.query.country || 'argentina').toLowerCase().trim();
 
+  // =========================================================
+  // STATE PERSISTENCE COUPLING
+  // =========================================================
+  req.session.selectedCountry = countryId;
+
   try {
     const countryModulePath = path.join(__dirname, '../../data/countries', countryId, 'index.js');
-
+ 
     if (!fs.existsSync(countryModulePath)) {
       return res.send(`
         <div class="p-8 bg-surface rounded-xl border border-dashed border-amber-500/30 text-center max-w-2xl mx-auto mt-6">
